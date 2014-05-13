@@ -2,33 +2,44 @@
 #define Particle_H
 
 
-#include "Vector3D.h"
+#include "SoaVector3D.h"
 
 template <typename T>
 class Particle {
 public:
 
-  template<typename T> using V3D = Vector3D<T>;
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
 
+  using T3D = Vector3D<T>;
+
+  using V3D = Vector3D<value>;
   using C3D = Vector3D<value const &>;
   using L3D = Vector3D<ref>;
 
- 
-  Particle(T m, V3D pos, V3D vel, V3D acc) : m_pos(pos), m_vel(vel)
+  Particle(){}
+  Particle(T m, T3D pos, T3D vel, T3D acc) : m_pos(pos), m_vel(vel)
 				  , m_acc(acc)
 				  , m_mass(m) {}
 
-  value mass() const { return m_mass;}
-  C3D position() const { return m_pos;}
-  C3D velocity() const { return m_vel;}
 
-  C3D acceleration() const { return m_acc;}
-  V3D & acceleration() { return m_acc;}
+  void fill (value m, V3D pos, V3D vel, V3D acc) {
+    m_pos=pos; m_vel=vel; m_acc=acc; m_mass=m;
+  }
+
+
+  value mass() const { return m_mass;}
+  T3D const & position() const { return m_pos;}
+  T3D const & velocity() const { return m_vel;}
+
+  T3D const & acceleration() const { return m_acc;}
+  T3D & acceleration() { return m_acc;}
 
   void update() {
-    update(m_acc);
+    C3D a =  m_acc*value(0.5);
+    m_pos += m_vel + a;
+    m_vel += m_acc;
+
   }
 
 
@@ -39,9 +50,9 @@ public:
   }
 
 private:
-  V3D m_pos;
-  V3D m_vel;
-  V3D m_acc;
+  T3D m_pos;
+  T3D m_vel;
+  T3D m_acc;
   T m_mass;
 
 };
@@ -56,14 +67,14 @@ public:
   using RP = Particle<Float &&>;
   using LP = Particle<Float&>;
   using Soa = SOA3D<Float>;
-
+  using uint = unsigned int;
 
   explicit Particles(uint n) : m_pos(n), m_vel(n),m_acc(n),m_mass(n), m_n(n){} 
 
   uint size() const { return m_n;}
 
-  CP operator[i] const { return LP(m_mass[i],m_vel[i],m_acc[i]); }
-  LP operator[i]       { return LP(m_mass[i],m_vel[i],m_acc[i]); }
+  CP operator[](uint i) const { return CP(m_mass[i],m_pos[i],m_vel[i],m_acc[i]); }
+  LP operator[](uint i)       { return LP(m_mass[i],m_pos[i],m_vel[i],m_acc[i]); }
   
 
 

@@ -1,7 +1,8 @@
 // #include "Box.h"
 //#include "BoxVect.h"
 
-#include "BoxSimpleSoa.h"
+#include "BoxSoa.h"
+// #include "BoxSimpleSoa.h"
 // #include "BoxNaiveSoa.h"
 
 #include<iostream>

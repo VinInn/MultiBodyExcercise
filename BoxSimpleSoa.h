@@ -63,7 +63,7 @@ void Box::computeForce() {
   
   auto force = [&](uint i, uint j) -> V3D {
     auto && delta = particles.position(j)-particles.position(i);
-    auto d = dist(particles.position(i),particles.position(j))+eps;
+    auto d = dist(particles.position(j),particles.position(i))+eps;
     return delta*(fact/(d*std::sqrt(d)));
   };
   
