@@ -1,0 +1,2 @@
+c++ -std=c++1y -Ofast -fopenmp -Wall main.cpp  --param vect-max-version-for-alias-checks=100  -funsafe-loop-optimizations -ftree-loop-distribution -ftree-loop-if-convert-stores -fipa-pta -Wunsafe-loop-optimizations
+

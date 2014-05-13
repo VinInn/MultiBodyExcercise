@@ -1,0 +1,3 @@
+c++ -std=c++11 -Ofast -Wall -fopenmp -S main.cpp   -fno-math-errno -o main_Ofast.S
+c++ -std=c++11 -O3 -Wall -fopenmp -S main.cpp   -fno-math-errno -o main_O3.S
+
