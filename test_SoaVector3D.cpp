@@ -1,6 +1,8 @@
 #include "Vector3D.h"
 #include<cassert>
 
+#include "rdtscp.h"
+
 using V3D = Vector3D<float>;
 using R3D = Vector3D<float&>;
 using Soa = SOA3D<float>;
@@ -37,15 +39,19 @@ int main() {
   vv[0]=k1;
   auto nv = vv.size();
   for (auto i=1U; i<nv; ++i) vv[i] = vv[i-1]+k1;
+  long long tv = -rdtscp();
   auto dv = weight(k0,vv);
-
+  tv += rdtscp();
 
   Soa s(128); auto n = s.size(); s[0]=k1;
   for (auto i=1U; i<n; ++i) s[i] = s[i-1]+k1;
 
+  long long ts = -rdtscp();
   auto ds = weight(k0,s);
-  
+  ts += rdtscp();
+ 
   std::cout << dv << ' ' << ds << std::endl;
+  std::cout << tv << ' ' << ts << std::endl;
 
   return ds*k3>3.45f;
 
