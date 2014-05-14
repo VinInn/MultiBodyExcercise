@@ -1,16 +1,17 @@
 #include<vector>
 #include<random>
-#include "ParticleSoa.h"
+#include "SimpleParticleSoa.h"
 #include<atomic>
 
 class Box {
 public:
   Box(unsigned int nBody);
-  using V3D = Particles::V3D;
-  using R3D = Particles::R3D;
-  using Soa = Particles::Soa;
-  using Float = Particles::Float;
-  using uint = Particles::uint;
+
+
+  using Float = vect3d::Float;
+  using uint = unsigned int;
+  using V3D =  Particles::V3D;
+
 
   void oneStep() {
     computeForce();

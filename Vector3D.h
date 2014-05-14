@@ -178,7 +178,6 @@ auto dist(V1 const & a, V2 const & b) ->decltype(dist2(a,b)){
 
 
 namespace vect3d {
-  constexpr unsigned int DIM=4;
   using Float = float;
 
   constexpr float zerof=0.; 

@@ -2,7 +2,7 @@
 #define Particle_H
 
 
-#include "SoaVector3D.h"
+#include "Vector3D.h"
 
 class Particles {
 public:
@@ -20,7 +20,7 @@ public:
 
   void fill(uint i, Float m, V3D pos, V3D vel) {
     m_pos[i]= pos; m_vel[i] = vel;
-    m_acc[i] = vect3d::ZERO::toVF();
+    m_acc[i] = vect3d::ZERO::toV();
     m_mass[i] = m;
   }
 
