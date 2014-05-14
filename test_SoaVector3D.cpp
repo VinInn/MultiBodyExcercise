@@ -1,10 +1,12 @@
-#include "SoaVector3D.h"
+#include "Vector3D.h"
+#include<cassert>
 
 using V3D = Vector3D<float>;
 using R3D = Vector3D<float&>;
 using Soa = SOA3D<float>;
 
-float weight(V3D v, Soa & s) {
+template<typename Cont>
+float weight(V3D v, Cont const & s) {
   auto n = s.size();
   float a = 0.;
   for (auto i=0U; i<n; ++i) {
@@ -13,6 +15,8 @@ float weight(V3D v, Soa & s) {
   return a/float(n);
 }
 
+
+#include<iostream>
 int main() {
   
   V3D v0 = vect3d::ZERO();
@@ -29,13 +33,21 @@ int main() {
   auto k2 = dot(k1,k0);
   auto k3 = dist(k0,k1)*k2;
 
+  std::vector<V3D> vv(128);
+  vv[0]=k1;
+  auto nv = vv.size();
+  for (auto i=1U; i<nv; ++i) vv[i] = vv[i-1]+k1;
+  auto dv = weight(k0,vv);
 
-  Soa s(128);auto n = s.size(); s[0]=k1;
+
+  Soa s(128); auto n = s.size(); s[0]=k1;
   for (auto i=1U; i<n; ++i) s[i] = s[i-1]+k1;
 
-    auto d = weight(k0,s);
+  auto ds = weight(k0,s);
   
-  return d*k3>3.45f;
+  std::cout << dv << ' ' << ds << std::endl;
+
+  return ds*k3>3.45f;
 
 
 
