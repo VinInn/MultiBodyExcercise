@@ -5,7 +5,7 @@
 #include "align_allocator.h"
 #include<vector>
 
-template<typename T> using AVector = std::vector<T,align_allocator<T,16>>;
+template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 
 #define  USESOA
 
