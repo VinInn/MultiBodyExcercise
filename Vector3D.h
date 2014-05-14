@@ -1,91 +1,130 @@
 #ifndef Vector3D_H
 #define Vector3D_H
 #include<cmath>
+#include<type_traits>
 
+#define  USESOA
+
+#ifndef USESOA
+// #define USEVECEXT
+#endif
 
 
 template<typename T>
 class Vector3D {
 public:
-  static constexpr T zero=0.; 
-  static constexpr unsigned int DIM=4;
-  using type = T;
+  static constexpr unsigned int DIM=3;
+  using value = typename std::remove_reference<T>::type;
+  using ref = typename std::add_lvalue_reference<T>::type;
+
 
   Vector3D(){}
-  //  Vector3D(T x, T y, T z) : v{x,y,z,zero} {}
-  Vector3D(T x, T y, T z) : v{x,y,z} {}
+  Vector3D(T ix, T iy, T iz) : xi(ix), yi(iy), zi(iz) {}
+  template<typename V>
+  Vector3D(V v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
+  // template<typename V>
+  //Vector3D(V const & v) { xi = v.x();  yi=v.y(); zi=v.z();}
+  //template<typename V>
+  // Vector3D(V && v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
+  template<typename V>
+  Vector3D & operator=(V const & v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
 
-  T x() const { return v[0];}
-  T y() const { return v[1];}
-  T z() const { return v[2];}
-
-  T operator[](int i) const { return v[i];} 
-  T & operator[](int i) { return v[i];} 
 
 
-  Vector3D<T> operator-() {
-    for (auto i=0U; i<Vector3D<T>::DIM; ++i) v[i]=-v[i];
-    return *this;
+  value x() const { return xi;}
+  value y() const { return yi;}
+  value z() const { return zi;}
+  ref x() { return xi;}
+  ref y() { return yi;}
+  ref z() { return zi;}
+
+  value operator[](unsigned int k) const {
+    return (k==0) ? x() :( k==1 ? y() : z()); 
+  }
+
+  ref operator[](unsigned int k) {
+    return (k==0) ? x() :( k==1 ? y() : z()); 
   }
 
 
-  Vector3D<T> operator+=(Vector3D<T>b) {
-    for (auto i=0U; i<Vector3D<T>::DIM; ++i) v[i]+=b[i];
-    return *this;
-  }
-  Vector3D<T> operator-=(Vector3D<T> b) {
-    for (auto i=0U; i<Vector3D<T>::DIM; ++i) v[i]-=b[i];
+  template<typename V>
+  Vector3D<T> operator+=(V b) {
+    xi+=b.x(); yi+=b.y(); zi+=b.z();
     return *this;
   }
 
-  Vector3D<T> operator*=(T b) {
-    for (auto i=0U; i<Vector3D<T>::DIM; ++i) v[i]*=b;
+  template<typename V>
+  Vector3D<T> operator-=(V b) {
+    xi-=b.x(); yi-=b.y(); zi-=b.z();
     return *this;
   }
 
-  Vector3D<T> operator/=(T b) {
-    for (auto i=0U; i<Vector3D<T>::DIM; ++i) v[i]/=b;
+  Vector3D<T> operator*=(value b) {
+    xi*=b; yi*=b; zi*=b;
     return *this;
   }
 
+  Vector3D<T> operator/=(value b) {
+    xi/=b; yi/=b; zi/=b;
+    return *this;
+  }
 
 private:
 
-  T v[DIM];
+  T xi; T yi; T zi; 
 
 };
 
-template<typename T>
-Vector3D<T> operator+(Vector3D<T> a, Vector3D<T> b) {
-  Vector3D<T> r = a; r+=b;
-  return r;
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type> operator+(Vector3D<T1> a, Vector3D<T2> b) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  //  return V(a.x()+b.x(),a.y()+b.y(),a.z()+b.z());
+  V r=a; return r+=b;
 }
 
-template<typename T>
-Vector3D<T> operator-(Vector3D<T> a, Vector3D<T> b) {
-  Vector3D<T> r = a; r-=b;
-  return r;
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_reference<T1>::type> operator-(Vector3D<T1> a, Vector3D<T2> b) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  //  return V(a.x()-b.x(),a.y()-b.y(),a.z()-b.z());
+  V r=a; return r-=b;
 }
 
-template<typename T>
-Vector3D<T> operator*(T a, Vector3D<T> b) {
-  Vector3D<T> r;
-  for (auto i=0U; i<Vector3D<T>::DIM; ++i) r[i]=a*b[i];
-  return r;
+
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
+operator*(T1 b, Vector3D<T2> a) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  V r=a; return r*=b;
+  //  return V(a.x()*b,a.y()*b,a.z()*b);
+
 }
 
-template<typename T>
-Vector3D<T> operator*(Vector3D<T> b, T a) {
-  Vector3D<T> r;
-  for (auto i=0U; i<Vector3D<T>::DIM; ++i) r[i]=a*b[i];
-  return r;
+
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
+operator*(Vector3D<T2> a, T1 b) {
+  return b*a;
 }
 
-template<typename T>
-Vector3D<T> operator/(Vector3D<T> b, T a) {
-  Vector3D<T> r=b;
-  for (auto i=0U; i<Vector3D<T>::DIM; ++i) r[i]/=a;
-  return r;
+
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
+operator/(Vector3D<T2> a, T1 b) {
+  Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type> r = a;
+  return r/=b;
+}
+
+
+
+template<typename V1,typename V2 >
+inline
+auto dot(V1 const & a, V2 const & b)  ->decltype(a.x()*b.x()) {
+  return a.x()*b.x() + a.y()*b.y() + a.z()*b.z();
 }
 
 
@@ -103,39 +142,37 @@ template<typename T> using Vec4D = ExtVec<T,4>;
 
 
 
-
+#ifdef USEVECEXT
 template<typename V1,typename V2 >
-auto dot(V1 a, V2 b)  ->decltype(a[0]*b[0]) {
+auto dot(V1 const & a, V2 const & b)  ->decltype(a[0]*b[0]) {
   decltype(a[0]*b[0]) r=0;
   for (auto i=0U; i<4; ++i) r+=a[i]*b[i];
   return r;
 }
+#endif
 
 
-
-template<typename T>
-T dot(Vector3D<T> a, Vector3D<T> b) {
-  T r=0;
-  for (auto i=0U; i<Vector3D<T>::DIM; ++i) r+=a[i]*b[i];
-  return r;
-}
 
 
 template<typename V>
-auto mag(V a) ->decltype(dot(a,a)) {
+inline
+auto mag(V const & a) ->decltype(dot(a,a)) {
   return std::sqrt(dot(a,a));
 } 
 
 
 template<typename V1,typename V2 >
-auto dist2(V1 a, V2 b) ->decltype(dot(a-b,a-b)){
-  auto d = a-b;
+inline
+auto dist2(V1 const & a, V2 const & b) ->decltype(dot(a-b,a-b)){
+  auto && d = a-b;
   return dot(d,d);
+  //auto pow2 = [](auto x) { return x*x;};
+  //return pow2(a.x()-b.x()) + pow2(a.y()-b.y()) + pow2(a.z()-b.z());
 }
 
-
 template<typename V1,typename V2 >
-auto dist(V1 a, V2 b) ->decltype(dist2(a,b)){
+inline
+auto dist(V1 const & a, V2 const & b) ->decltype(dist2(a,b)){
   return std::sqrt(dist2(a,b));
 }
 
@@ -147,8 +184,12 @@ namespace vect3d {
   constexpr float zerof=0.; 
   constexpr float zerod=0.; 
   struct ZERO{
-    operator Vector3D<float>() const { return Vector3D<float>(zerof,zerof,zerof); }
-    operator Vector3D<double>() const { return Vector3D<double>(zerod,zerod,zerod); }
+
+    static Vector3D<Float> toV() { Float zerol=0.; return Vector3D<Float>(zerol,zerol,zerol); }
+
+    
+    operator Vector3D<float>() const { float zerol=0.; return Vector3D<float>(zerol,zerol,zerol); }
+    operator Vector3D<double>() const { double zerol=0.; return Vector3D<double>(zerol,zerol,zerol); }
     operator Vec4D<float>() const { return Vec4D<float>{zerof,zerof,zerof,zerof}; }
     operator Vec4D<double>() const { return Vec4D<double>{zerod,zerod,zerod,zerod}; }
 
@@ -157,10 +198,31 @@ namespace vect3d {
 }
 
 
+#include<vector>
+template<typename T>
+class SOA3D {
+public:
+  using V3D = Vector3D<T>;
+  using R3D = Vector3D<T&>;
+  using C3D = Vector3D<T const&>;
 
 
-using Vect3D = Vector3D<vect3d::Float>;
-//using Vect3D = Vec4D<vect3d::Float>;
+  explicit SOA3D(unsigned int is) : vx(is),vy(is),vz(is){}
+  
+  R3D operator[](unsigned int i) { return R3D(vx[i],vy[i],vz[i]); }
+  C3D operator[](unsigned int i) const { return C3D(vx[i],vy[i],vz[i]); }
+  
+  unsigned int size() const { return vx.size();}
+  
+private:
+  
+  std::vector<T> vx,vy,vz;
+  
+};
+
+
+//using Vect3D = Vector3D<vect3d::Float>;
+// using Vect3D = Vec4D<vect3d::Float>;
 
 
 #endif

@@ -2,11 +2,13 @@
 #include<random>
 #include "Particle.h"
 #include<atomic>
+
 class Box {
 public:
   Box(unsigned int nBody);
-  using V3D = Particle::V3D;
-  using Float = Particle::Float;
+  using Float = vect3d::Float;
+  using uint = unsigned int;
+  using V3D =  Particle<Float>::V3D;
 
 
   void oneStep() {
@@ -28,17 +30,14 @@ private:
 
 
   Float wallPos = 1.;
-  std::vector<Particle> particles;
+  Particles particles;
 
-#ifdef NOACC
-std::vector<V3D> accelerations;
-#endif
 
 };
 
 
 
-Box::Box(unsigned int nBody) {
+Box::Box(unsigned int nBody) : particles(nBody){
 
   std::mt19937 eng;
   std::uniform_real_distribution<Float> rgen(-wallPos,wallPos);
@@ -48,82 +47,61 @@ Box::Box(unsigned int nBody) {
   constexpr Float mass = 1.;
 
   for (auto i=0U; i< nBody; ++i)
-    particles.emplace_back(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},zero);
-
-#ifdef NOACC
-  accelerations.resize(nBody,zero);
-#endif
+    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},zero,zero);
 
 
 }
 
 
 void Box::computeForce() {
-  constexpr Float eps = 0.0001;
+  //  constexpr Float eps = 0.0001;
   V3D zero = vect3d::ZERO();
 
-  constexpr Float fact = .1e-6;
+  // constexpr Float fact = .1e-6;
  
-  auto force = [=](Particle const & a, Particle const & b) -> V3D {
-    auto delta = a.position()-b.position();
-    auto d = dist(a.position(),b.position())+eps;
+  
+  auto force = [=](auto a, auto b) -> V3D {
+    constexpr Float eps = 0.0001;
+    constexpr Float fact = .1e-6;
+    
+    auto && delta = b.position()-a.position();
+    auto d = dist(b.position(),a.position())+eps;
     return delta*(fact/(d*std::sqrt(d)));
   };
+  
 
   auto nBody= particles.size();
-#ifdef NOACC
-  for (auto & a: accelerations) a=zero;
-#else
-  for (auto & p: particles) p.acceleration()=zero;
-#endif
+
+  for (auto i=0U; i< nBody; ++i) particles[i].acceleration()=zero;
+
 
 
   for (auto i=1U; i< nBody; ++i) {
-    auto tmp = particles[i].acceleration();
+    V3D tmp = particles[i].acceleration();
     for (auto j=0U; j< i-1; ++j) {
-      auto f = force(particles[j],particles[i]);
-#ifdef NOACC
-      accelerations[i]-=f;
-      accelerations[j]+=f;
-#else
+      auto && f = force(particles[i],particles[j]);
       tmp-=f;
       particles[j].acceleration()+=f;
-#endif
     }
-    particles[i].acceleration()=tmp;
+    particles[i].acceleration() = tmp;
   }
 
-
-#ifdef NOACC
-  for (auto i=0U; i< nBody; ++i) 
-    accelerations[i]/=particles[i].mass();
-#else
-  for (auto p: particles) p.acceleration()/=p.mass();
-#endif
+  for (auto i=0U; i< nBody; ++i) particles[i].acceleration()/=particles[i].mass();
 }
 
 
-
-
-
-
-#ifdef NOACC
 void Box::evolve() {
-  auto i=0U;
-  for (auto & p: particles) p.update(accelerations[i++]);
+  auto nBody= particles.size();
+  for (auto i=0U; i< nBody; ++i) particles[i].update();
 }
-#else
-void Box::evolve() {
-  for (auto & p: particles) p.update();
-}
-#endif
 
 
 void Box::verifyBoundaries() {
-  for (auto & p: particles) {
-    for (unsigned int i=0; i<3; ++i) {
-      if (p.position()[i] > wallPos) p.scatter(i,wallPos);
-      else if (p.position()[i] < -wallPos) p.scatter(i,-wallPos);
+  auto nBody= particles.size();
+  for (auto i=0U; i< nBody; ++i) {
+    for (unsigned int k=0; k<3; ++k) {
+      if (particles[i].position()[k] > wallPos) particles[i].scatter(k,wallPos);
+      else if (particles[i].position()[k] < -wallPos) particles[i].scatter(k,-wallPos);
     }
   }
 }
@@ -131,24 +109,17 @@ void Box::verifyBoundaries() {
 
 Box::Float Box::temperature() const {
   Float t=0.;
-  for (auto const & p: particles) t+= mag(p.velocity());
+  auto nBody= particles.size();
+  for (auto i=0U; i< nBody; ++i) t+= mag(particles[i].velocity());
   return t/Float(particles.size());
 }
 
 
 #include<cassert>
 void Box::check() const {
-  if(vect3d::DIM>3) 
-    for (auto const & p: particles) {
-      assert(std::abs(p.position()[3])==0);
-      assert(std::abs(p.velocity()[3])==0);
-#ifndef NOACC
-      assert(std::abs(p.acceleration()[3])==0);
-#endif
-    }
-  
-  for (auto const & p: particles)
-    for (unsigned int i=0; i<3; ++i) 
-      assert(std::abs(p.position()[i]) <= wallPos);
+  auto nBody= particles.size();
+  for (auto i=0U; i< nBody; ++i)
+    for (unsigned int k=0; k<3; ++k) 
+      assert(std::abs(particles[i].position()[k]) <= wallPos);
 
 }
