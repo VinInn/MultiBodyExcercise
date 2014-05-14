@@ -4,11 +4,6 @@
 
 #include "Vector3D.h"
 
-// #define  USESOA
-
-#ifndef USESOA
-// #define USEVECEXT
-#endif
 
 template <typename T>
 class Particle {
