@@ -2,6 +2,10 @@
 #define Vector3D_H
 #include<cmath>
 #include<type_traits>
+#include "align_allocator.h"
+#include<vector>
+
+template<typename T> using AVector = std::vector<T,align_allocator<T,16>>;
 
 #define  USESOA
 
@@ -215,7 +219,7 @@ public:
   
 private:
   
-  std::vector<T> vx,vy,vz;
+  AVector<T> vx,vy,vz;
   
 };
 

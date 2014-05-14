@@ -90,7 +90,7 @@ private:
   Soa m_pos;
   Soa m_vel;
   Soa m_acc;
-  std::vector<Float> m_mass;
+  AVector<Float> m_mass;
   uint m_n;
 
 };
