@@ -1,0 +1,2 @@
+c++ -std=c++1y -Ofast test_Array3D.cpp -fopt-info-vec
+
