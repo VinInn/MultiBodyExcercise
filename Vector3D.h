@@ -26,10 +26,6 @@ public:
   Vector3D(T ix, T iy, T iz) : xi(ix), yi(iy), zi(iz) {}
   template<typename V>
   Vector3D(V v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
-  // template<typename V>
-  //Vector3D(V const & v) { xi = v.x();  yi=v.y(); zi=v.z();}
-  //template<typename V>
-  // Vector3D(V && v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
   template<typename V>
   Vector3D & operator=(V const & v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
 
@@ -190,7 +186,6 @@ namespace vect3d {
 
     static Vector3D<Float> toV() { Float zerol=0.; return Vector3D<Float>(zerol,zerol,zerol); }
 
-    
     operator Vector3D<float>() const { float zerol=0.; return Vector3D<float>(zerol,zerol,zerol); }
     operator Vector3D<double>() const { double zerol=0.; return Vector3D<double>(zerol,zerol,zerol); }
     operator Vec4D<float>() const { return Vec4D<float>{zerof,zerof,zerof,zerof}; }
@@ -222,10 +217,6 @@ private:
   AVector<T> vx,vy,vz;
   
 };
-
-
-//using Vect3D = Vector3D<vect3d::Float>;
-// using Vect3D = Vec4D<vect3d::Float>;
 
 
 #endif

@@ -391,8 +391,8 @@ void loopInsideKernel(S const & r) {
     float t = cross(r,lines[i]);
     auto  x2 = lines[i].go(t);
     //bool ok = x2.x >0;
-    bool ok = inside(r,x2);
-    auto && xx = ok ? x2 : decltype(x2)(lines[i].p);
+    in[i] = inside(r,x2);
+    auto && xx = in[i] ? x2 : decltype(x2)(lines[i].p);
     // if (in[i]) 
     lines[i].p  = xx;
   }
