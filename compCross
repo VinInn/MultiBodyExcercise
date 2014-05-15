@@ -1,0 +1,2 @@
+c++ -std=c++1y -Ofast -Wall CrossingPlane.cpp -fopt-info-vec-missed -fno-tree-slp-vectorize -march=nehalem
+

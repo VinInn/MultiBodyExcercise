@@ -65,8 +65,13 @@ void Box::computeForce() {
     constexpr Float fact = .1e-6;
     
     auto && delta = b.position()-a.position();
-    auto d = dist(b.position(),a.position())+eps;
-    return delta*(fact/(d*std::sqrt(d)));
+    // long range force
+    // auto d = dist(b.position(),a.position())+eps;
+    // return delta*(fact/(d*std::sqrt(d)));
+    // short range force
+    auto d2 = dist2(b.position(),a.position())+eps;
+    return delta*(Float(10)*fact/d2);
+
   };
   
 
@@ -78,7 +83,7 @@ void Box::computeForce() {
 
   for (auto i=1U; i< nBody; ++i) {
     V3D tmp = particles[i].acceleration();
-    for (auto j=0U; j< i-1; ++j) {
+    for (auto j=0U; j< i; ++j) {
       auto && f = force(particles[i],particles[j]);
       tmp-=f;
       particles[j].acceleration()+=f;

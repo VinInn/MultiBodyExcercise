@@ -9,7 +9,9 @@ void ok() {
   }
 }
 
+
 void noOk() {
+#pragma GCC ivdep
   for (auto j=0U; j<N; ++j) {
     auto ax = xx-px[j];
     vv+=ax;

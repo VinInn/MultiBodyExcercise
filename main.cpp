@@ -33,7 +33,7 @@ main(int argc, char* argv[]){
   
   std::cout << "start " << nbody << std::endl;
   
-  for (int k=0; k<10; ++k) {
+  for (int k=0; k<100; ++k) {
     auto t = -omp_get_wtime();
     for (int i=0; i<10; ++i) box.oneStep();
     t+=omp_get_wtime();

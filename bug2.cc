@@ -4,6 +4,7 @@ unsigned int N=1024;
 
 
 void one(unsigned int i) {
+#pragma GCC ivdep
    for (auto j=i+1; j<N; ++j) {
       auto ax = px[j]-px[i];
       vx[i]-=ax;
@@ -13,7 +14,7 @@ void one(unsigned int i) {
 
 void oneOK(unsigned int k) {
   auto tmp = vx[k];
-   for (auto j=0; j<k-1; ++j) {
+   for (auto j=0U; j<k-1; ++j) {
       auto ax = px[j]-px[k];
       tmp-=ax;
       vx[j]+=ax;
@@ -23,7 +24,8 @@ void oneOK(unsigned int k) {
 
 
 void oneNope(unsigned int k) {
-   for (auto j=0; j<k-1; ++j) {
+#pragma GCC ivdep
+   for (auto j=0U; j<k-1; ++j) {
       auto ax = px[j]-px[k];
       vx[k]-=ax;
       vx[j]+=ax;
