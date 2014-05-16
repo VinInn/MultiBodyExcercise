@@ -18,8 +18,12 @@ template<typename T>
 class Vector3D {
 public:
   static constexpr unsigned int DIM=3;
-  using value = typename std::remove_reference<T>::type;
-  using ref = typename std::add_lvalue_reference<T>::type;
+  using value = typename std::remove_const<typename std::remove_reference<T>::type>::type;
+  using  ref = typename std::add_lvalue_reference<T>::type;
+  using cref = typename std::add_lvalue_reference<typename std::add_const< T>::type>::type;
+  using VAL = Vector3D<value>;
+  using CREF = Vector3D<value const &>;
+  using REF = Vector3D<ref>;
 
 
   Vector3D(){}
@@ -27,13 +31,16 @@ public:
   template<typename V>
   Vector3D(V v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
   template<typename V>
-  Vector3D & operator=(V const & v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
+  Vector3D & operator=(V v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
+  Vector3D(Vector3D const & v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
+  Vector3D & operator=(Vector3D const & v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
+ 
+  
 
 
-
-  value x() const { return xi;}
-  value y() const { return yi;}
-  value z() const { return zi;}
+  cref x() const { return xi;}
+  cref y() const { return yi;}
+  cref z() const { return zi;}
   ref x() { return xi;}
   ref y() { return yi;}
   ref z() { return zi;}
@@ -48,30 +55,30 @@ public:
 
 
   template<typename V>
-  Vector3D<T> operator+=(V b) {
+  Vector3D<T> & operator+=(V b) {
     xi+=b.x(); yi+=b.y(); zi+=b.z(); // wi+=b.wi;
     return *this;
   }
 
   template<typename V>
-  Vector3D<T> operator-=(V b) {
+  Vector3D<T> & operator-=(V b) {
     xi-=b.x(); yi-=b.y(); zi-=b.z(); // wi-=b.wi;
     return *this;
   }
 
   template<typename V>
-  Vector3D<T> operator*=(V b) {
+  Vector3D<T> & operator*=(V b) {
     xi*=b.x(); yi*=b.y(); zi*=b.z(); // wi*=b.wi;
     return *this;
   }
 
 
-  Vector3D<T> operator*=(value b) {
+  Vector3D<T> & operator*=(value b) {
     xi*=b; yi*=b; zi*=b;  // wi*=b;
     return *this;
   }
 
-  Vector3D<T> operator/=(value b) {
+  Vector3D<T> & operator/=(value b) {
     xi/=b; yi/=b; zi/=b; // wi/=b;
     return *this;
   }

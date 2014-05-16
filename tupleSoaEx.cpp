@@ -17,10 +17,10 @@ struct Vect {
   Vect() {}
   Vect(T ix, T iy, T iz, int k=0) : x(ix),y(iy),z(iz){}
   template<typename V>
-  Vect(V v) : x(v.x), y(v.y), z(v.z) {}
+  Vect(V const & v) : x(v.x), y(v.y), z(v.z) {}
   Vect(Vect const & v) : x(v.x), y(v.y), z(v.z) {}
   template<typename V>
-  Vect& operator=(V v) { x=v.x; y=v.y; z=v.z; return *this; }
+  Vect& operator=(V const & v) { x=v.x; y=v.y; z=v.z; return *this; }
   Vect& operator=(Vect const & v) { x=v.x; y=v.y; z=v.z; return *this; }
 
   T x,y,z;
@@ -104,19 +104,21 @@ int main() {
   SoaN s2{V(10),V(10),V(10)};
 
 
-  Vect<float &> v0 = a2v(s, 3);
-  Vect<float &> v2 = t2v(s2, 5);
+  auto v0 = a2v(s, 3);
+  auto v2 = t2v(s2, 5);
   v0.x=-9.; v2.y=v0.x;
+
+  std::cout << s[0][3] << ' ' << std::get<1>(s2)[5] << std::endl;
 
   Soa<Vect<float>, float,float,float,int> soaI(30);
   std::cout << soaI.size() << std::endl;
 
-  Vect<float &> vk = soaI[23];
+  auto vk = soaI[23];
   vk.x=3.14;
 
   soaI[11] = v0;
 
-  
+  std::cout << std::get<0>(soaI.data)[23] << ' ' << std::get<0>(soaI.data)[11]  << std::endl;
 
   return v0.x*v2.y;
 }
