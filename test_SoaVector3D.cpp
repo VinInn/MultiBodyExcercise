@@ -8,18 +8,28 @@ using R3D = Vector3D<float&>;
 using Soa = SOA3D<float>;
 
 template<typename Cont>
-float weight(V3D v, Cont const & s) {
+float weight(V3D const & v, Cont const & s) {
   auto n = s.size();
   float a = 0.;
   for (auto i=0U; i<n; ++i) {
-    a+= dist(v,s[i]);
+    a+= dist2(v,s[i]);
   } 
   return a/float(n);
 }
 
 
+template<typename Cont>
+void update(V3D const & v, Cont & s) {
+  auto n = s.size();
+  for (auto i=0U; i<n; ++i) {
+    s[i]+=v;
+  } 
+}
+
+
+
 #include<iostream>
-int main() {
+int go() {
   
   V3D v0 = vect3d::ZERO();
   float one = 1;
@@ -35,7 +45,8 @@ int main() {
   auto k2 = dot(k1,k0);
   auto k3 = dist(k0,k1)*k2;
 
-  std::vector<V3D> vv(128);
+  //std::vector<V3D> vv(1280);
+  AVector<V3D> vv(1280);
   vv[0]=k1;
   auto nv = vv.size();
   for (auto i=1U; i<nv; ++i) vv[i] = vv[i-1]+k1;
@@ -43,7 +54,7 @@ int main() {
   auto dv = weight(k0,vv);
   tv += rdtscp();
 
-  Soa s(128); auto n = s.size(); s[0]=k1;
+  Soa s(1280); auto n = s.size(); s[0]=k1;
   for (auto i=1U; i<n; ++i) s[i] = s[i-1]+k1;
 
   long long ts = -rdtscp();
@@ -52,9 +63,24 @@ int main() {
  
   std::cout << dv << ' ' << ds << std::endl;
   std::cout << tv << ' ' << ts << std::endl;
+  tv = -rdtscp();
+  update(k0,vv);
+  tv += rdtscp();
+  ts = -rdtscp();
+  update(k0,s);
+  ts += rdtscp();
+  std::cout << tv << ' ' << ts << std::endl;
+  
 
   return ds*k3>3.45f;
 
+}
 
 
+int main() {
+  int ret=0;
+  for (int i=0; i<10; ++i)
+    ret+=go();
+  
+  return ret;
 }

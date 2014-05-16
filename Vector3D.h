@@ -49,29 +49,38 @@ public:
 
   template<typename V>
   Vector3D<T> operator+=(V b) {
-    xi+=b.x(); yi+=b.y(); zi+=b.z();
+    xi+=b.x(); yi+=b.y(); zi+=b.z(); // wi+=b.wi;
     return *this;
   }
 
   template<typename V>
   Vector3D<T> operator-=(V b) {
-    xi-=b.x(); yi-=b.y(); zi-=b.z();
+    xi-=b.x(); yi-=b.y(); zi-=b.z(); // wi-=b.wi;
     return *this;
   }
 
+  template<typename V>
+  Vector3D<T> operator*=(V b) {
+    xi*=b.x(); yi*=b.y(); zi*=b.z(); // wi*=b.wi;
+    return *this;
+  }
+
+
   Vector3D<T> operator*=(value b) {
-    xi*=b; yi*=b; zi*=b;
+    xi*=b; yi*=b; zi*=b;  // wi*=b;
     return *this;
   }
 
   Vector3D<T> operator/=(value b) {
-    xi/=b; yi/=b; zi/=b;
+    xi/=b; yi/=b; zi/=b; // wi/=b;
     return *this;
   }
 
 private:
 
-  T xi; T yi; T zi; 
+  T xi; T yi; T zi;
+public:
+  //  value wi=0;
 
 };
 
@@ -89,6 +98,13 @@ Vector3D<typename std::remove_reference<T1>::type> operator-(Vector3D<T1> a, Vec
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   //  return V(a.x()-b.x(),a.y()-b.y(),a.z()-b.z());
   V r=a; return r-=b;
+}
+
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_reference<T1>::type> operator*(Vector3D<T1> a, Vector3D<T2> b) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  V r=a; return r*=b;
 }
 
 

@@ -2,7 +2,8 @@
 #include<cstdio>
 #include<iostream>
 #include <typeinfo>
-\
+#include <cassert>
+
 // an "oriented" plane is defined by
 // nx*(x-xp)+ny(y-yp)+nz*(z-zp)=0 (or in vector notation: n*(x-p) * here is the dot-product)
 // for a generic point x,y,z this equation gives the distance of the point (with its sign) from the plane
@@ -83,12 +84,12 @@ struct Line final : public Trajectory {
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
  
- Line(): p(),c(){}
+ Line() {}
  Line(Point<T> const & ip, Vect<T> const & ic) : p(ip),c(ic){}
  template<typename L>
-   Line(L l) : p(l.p),c(l.p){}
+   Line(L l) : p(l.p),c(l.c){}
  template<typename L>
-   Line& operator=(L l) {p=l.p; c=l.p; return *this;}
+   Line& operator=(L l) {p=l.p; c=l.c; return *this;}
   Point<T> p;
   Vect<T> c;
 
@@ -284,7 +285,7 @@ Rectangle<float>  makeRectangle(float offr=0) {
   Vect<float>  u = {float(ny*nor),float(-nx*nor),0};
   Vect<float>  v = cross(n,u);
   Point<float>  p = {float(3./7.+offr),float(4./7.+offr),13./17.};
-  return Rectangle<float> (p,u,v,27./17.,15./17.);
+  return Rectangle<float> (p,u,v, 0.04*27./17.,0.035*15./17.);
 }
 
 inline
@@ -305,7 +306,7 @@ inline
 Line<float>  makeLine(float r, float z) {
   // a generic line (almost parallel to the plane...)
   double cy = -7./13.+r, cx=3./7.-r, cz=17./23.+z; 
-  double nor = 1./sqrt(cx*cx+cy*cy+cz*cz); 
+  double nor = 1./std::sqrt(cx*cx+cy*cy+cz*cz); 
   return Line<float> ({3.3/7.,4.4/7.,13./17.},{float(cx*nor),float(cy*nor),float(cz*nor)});
 }
 
@@ -362,19 +363,21 @@ void loopCross() {
 
   auto pl = makePlane();
   int n = lines.size();
-  float d2[n];
+  float d1[n], d2[n];
   for (int i=0; i!=n; ++i) {
+    d1[i] = distance(pl,lines[i].p);
     float t = cross(pl,lines[i]);
     auto  x2 = lines[i].go(t);
     d2[i] = distance(pl,x2);
   }
 
-  printf("\n");
-  for (int i=0; i!=n; ++i)
-    printf("%e,%a ",d2[i],d2[i]);
+  printf("\nTest Cross\n");
+  for (int i=0; i!=n; ++i) 
+    printf("%e:%e,%a ",d1[i],d2[i],d2[i]);
   printf("\n");
 }
 
+#include "rdtscp.h"
 
 
 template<typename S>
@@ -386,15 +389,27 @@ void loopInsideKernel(S const & r) {
   makeLines(lines);
 
   int n = lines.size();
-  bool in[n];
+  assert(n==N);
+
+  printf("\nStart dir\n");
+  for (int i=0; i!=n; ++i)
+    std::cout <<  lines[i].c.x <<",";
+  std::cout << std::endl;
+
+  long long ts = -rdtscp();
+  int in[n];
   for (int i=0; i<n; ++i) {
     float t = cross(r,lines[i]);
     auto  x2 = lines[i].go(t);
     in[i] = inside(r,x2);
-    auto && xx = in[i] ? x2 : decltype(x2)(lines[i].p);
+    // auto ok = inside(r,x2);
+    auto xx = in[i] ? x2 : decltype(x2)(lines[i].p);
     // if (in[i]) 
     lines[i].p  = xx;
   }
+  ts += rdtscp();
+  printf("\n");
+  std::cout << "time " << ts << std::endl;
 
   printf("\n");
   std::cout << typeid(S).name() << std::endl;
