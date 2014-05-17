@@ -355,6 +355,7 @@ void loopInsideKernel(S const & r) {
 
   long long ts = -rdtscp();
   int in[n];
+#pragma GCC ivdep
   for (int i=0; i<n; ++i) {
     float t = cross(r,lines[i]);
     auto  x2 = lines[i].go(t);
