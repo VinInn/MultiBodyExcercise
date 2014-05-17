@@ -1,2 +1,2 @@
-c++ -std=c++1y -Ofast -Wall CrossingPlane.cpp -fopt-info-vec-missed -fno-tree-slp-vectorize -march=nehalem
+c++ -std=c++1y -Ofast -Wall CrossingPlane.cpp -fopt-info-vec -fno-tree-slp-vectorize --param vect-max-version-for-alias-checks=200 -march=nehalem
 

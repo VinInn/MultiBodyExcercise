@@ -3,7 +3,6 @@
 #include<iostream>
 #include <typeinfo>
 #include <cassert>
-#include "UltimateSoa.h"
 
 // an "oriented" plane is defined by
 // nx*(x-xp)+ny(y-yp)+nz*(z-zp)=0 (or in vector notation: n*(x-p) * here is the dot-product)
@@ -16,9 +15,6 @@ template<typename T>
 struct Vect {
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
-  using CREF = Vect<value const &>;
-  using REF = Vect<ref>;
-  using SOATUPLE = std::tuple<UltimateSoa<T,false>,UltimateSoa<T,false>,UltimateSoa<T,false>>;
 
   Vect() {}
   Vect(T ix, T iy, T iz) : x(ix),y(iy),z(iz){}
@@ -87,12 +83,7 @@ template<typename T>
 struct Line final : public Trajectory {
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
-  using V = Vect<T>;
-  using CREF = Line<value const &>;
-  using REF = Line<ref>;
-  using SOATUPLE = std::tuple<UltimateSoa<V,true>, UltimateSoa<V,true>>;
  
-
  Line() {}
  Line(Point<T> const & ip, Vect<T> const & ic) : p(ip),c(ic){}
  template<typename L>
@@ -221,10 +212,60 @@ bool inside(RightTrapezoid<T1> const & r, Point<T2> const & p) {
 
 
 // SOA
-using Vects = UltimateSoa<Vect<float>,true>;
-using Points =  Vects;
-using Lines =  UltimateSoa<Line<float>,true>;
+struct Vects {
+  static constexpr int nValues=3;
+  using VV = Vect<float>;
+  using RV = Vect<float&>;
+  using CV = Vect<float const & >;
 
+  Vects() : mem(nullptr),m_size(0){}
+  Vects(int s, float * imem) : mem(imem),m_size(s){}
+  float * __restrict__ mem;
+  int m_size;
+  
+  float & x(int i) { return mem[i];}
+  float & y(int i) { return mem[i+size()];}
+  float & z(int i) { return mem[i+size()+size()];}
+
+  float const & x(int i) const { return mem[i];}
+  float const & y(int i) const { return mem[i+size()];}
+  float const & z(int i) const { return mem[i+size()+size()];}
+
+
+  CV operator[](int i) const {
+    return CV(x(i),y(i),z(i));
+  } 
+  RV operator[](int i) {
+    return RV(x(i),y(i),z(i));
+  } 
+
+  int size() const { return m_size;}
+  
+
+  
+};
+
+
+
+using Points =  Vects;
+
+struct Lines {
+  static constexpr int nValues=2*Vects::nValues;
+
+  using VL = Line<float>;
+  using RL = Line<float&>;
+  using CL = Line<float const & >;
+
+
+  Lines(){}
+  Lines(int s, float * mem):p(s,mem),c(s,mem+s*Vects::nValues){}
+  Vects p, c;
+
+  CL operator[](int i) const { return CL(p[i],c[i]);}
+  RL operator[](int i) { return RL(p[i],c[i]);}
+  int size() const { return p.size();  }
+
+};
 
 inline
 Plane<float> makePlane(float offr=0) {
@@ -316,7 +357,8 @@ void testInside() {
 
 void loopCross() {
   int N=256;
-  Lines lines(N);
+  float arena[N*Lines::nValues];
+  Lines lines(N,arena);
   makeLines(lines);
 
   auto pl = makePlane();
@@ -342,7 +384,8 @@ template<typename S>
 inline
 void loopInsideKernel(S const & r) {
   int N=256;
-  Lines lines(N);
+  float arena[N*Lines::nValues];
+  Lines lines(N,arena);
   makeLines(lines);
 
   int n = lines.size();
