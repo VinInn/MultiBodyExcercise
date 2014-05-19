@@ -5,7 +5,19 @@
 #include <tuple>
 #include <utility>
 #include <type_traits>
+#include "align_allocator.h"
 
+
+namespace details_UltimateSoa {
+  template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
+}
+
+template<typename T>
+struct UltimateSoaTraits {
+  using CREF = typename T::CREF;
+  using REF =  typename T::REF;
+  using SOATUPLE = typename T::SOATUPLE;
+};
 
 template<typename T, bool>
 class UltimateSoa {};
@@ -14,9 +26,9 @@ class UltimateSoa {};
 template<typename T>
 class UltimateSoa<T, true> {
 public:
-  using CREF = typename T::CREF;
-  using REF =  typename T::REF;
-  using Data = typename T::SOATUPLE;
+  using CREF = typename UltimateSoaTraits<T>::CREF;
+  using REF =  typename UltimateSoaTraits<T>::REF;
+  using Data = typename UltimateSoaTraits<T>::SOATUPLE;
 
    template<std::size_t... I>
    void resize_impl(unsigned int n, std::index_sequence<I...>) { 
@@ -55,16 +67,19 @@ public:
 
 
 template<typename T>
-class UltimateSoa<T, false> : public std::vector<T> {
+class UltimateSoa<T, false> : public details_UltimateSoa::AVector<T> {
 public:
+  using Storage = details_UltimateSoa::AVector<T>;
+  /*
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
   using VAL = UltimateSoa <value,false>;
   using CREF = UltimateSoa <value const &,false>;
   using REF = UltimateSoa<ref,false>;
-  
+  */  
+
   template<typename ... Args>
-  UltimateSoa(Args... args) : std::vector<T>(args...){}
+  UltimateSoa(Args... args) : Storage(args...){}
 
 };
 

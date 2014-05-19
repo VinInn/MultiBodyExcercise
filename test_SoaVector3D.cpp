@@ -33,7 +33,7 @@ int go() {
   
   V3D v0 = vect3d::ZERO();
   float one = 1;
-  V3D v2{one,one, one};
+  V3D v2{one, 2, 3.14};
 
   float x[3]={1.f}, y[3]={1.f}, z[3]={1.f};
   R3D v1(x[0],y[0],z[0]);

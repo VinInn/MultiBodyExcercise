@@ -22,7 +22,7 @@ public:
   using  ref = typename std::add_lvalue_reference<T>::type;
   using cref = typename std::add_lvalue_reference<typename std::add_const< T>::type>::type;
   using VAL = Vector3D<value>;
-  using CREF = Vector3D<value const &>;
+  using CREF = Vector3D<cref>;
   using REF = Vector3D<ref>;
 
 

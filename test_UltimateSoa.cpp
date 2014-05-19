@@ -24,12 +24,9 @@ struct Vect {
 
 template<typename T>
 struct Line {
+  using V = Vect<T>;
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
-  using CREF = Line<value const &>;
-  using REF = Line<ref>;
-  using V = Vect<T>;
-  using SOATUPLE = std::tuple<UltimateSoa<V,true>, UltimateSoa<V,true>>;
 
   Line() {}
   Line(V ip, V ic) : p(ip),c(ic){}
@@ -44,6 +41,16 @@ struct Line {
   
 };
 
+
+template<typename T>
+struct UltimateSoaTraits<Line<T>> {
+  using value = typename std::remove_reference<T>::type;
+  using ref = typename std::add_lvalue_reference<T>::type;
+  using CREF = Line<value const &>;
+  using REF = Line<ref>;
+  using V = Vect<T>;
+  using SOATUPLE = std::tuple<UltimateSoa<V,true>, UltimateSoa<V,true>>;
+};
 
 
 
