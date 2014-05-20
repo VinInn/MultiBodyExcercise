@@ -49,15 +49,15 @@ public:
   auto size() const { return m_n;}
 
   template<typename V, std::size_t... I>
-   V t2r_impl(int j, std::index_sequence<I...>) {
+   V t2r_impl(unsigned int j, std::index_sequence<I...>) {
    return V(std::get<I>(data)[j] ...); 
  }
 
-  REF operator[](int j) {
+  REF operator[](unsigned int j) {
    return t2r_impl<REF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
  }
 
-  CREF operator[](int j) const {
+  CREF operator[](unsigned int j) const {
    return t2r_impl<CREF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
  }
 

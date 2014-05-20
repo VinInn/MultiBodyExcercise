@@ -4,11 +4,11 @@
 #include<string>
 
 
-template<typename F=float, typename I=int, typename S=std::string, typename B=unsigned char, typename V = std::vector<int>> 
+template<typename Float=float, typename Int=int, typename String=std::string, typename Bool=unsigned char, typename VecInt = std::vector<int>> 
 struct DataT {
 
   DataT(){}
-  DataT(F ix, F iy, F iz, I is, I it, S inam, V iw, B io) :
+  DataT(Float ix, Float iy, Float iz, Int is, Int it, String inam, VecInt iw, Bool io) :
     x(ix),y(iy), z(iz), status(is), type(it), name(inam), what(iw), ok(io){}
 
   template <typename D>
@@ -26,23 +26,21 @@ struct DataT {
     return *this;
   }
 
-  void reset() { ok=0; } // false;}
+  void reset() { ok= false;}
 
 
-  F x,y,z;
-  I status;
-  I type;
-  S name;
-  V what;
-  B ok;
+  Float x,y,z;
+  Int status;
+  Int type;
+  String name;
+  VecInt what;
+  Bool ok;
 
 };
 
 
-
-
-
 using Data = DataT<>;
+
 
 template<>
 struct UltimateSoaTraits<Data> {
@@ -73,9 +71,10 @@ using DoD = UltimateSoa<Data,true>;
 // using Cont=DoD;
 template<typename Cont>
 void comp(Cont & cont) {
-  auto n = int(cont.size());
-#pragma GCC ivdep
-  for (auto i=0; i<n; ++i)
+  // auto n = int(cont.size());
+  // #pragma GCC ivdep
+  //  for (auto i=0; i<n; ++i)
+  for (auto i=0U; i<cont.size(); ++i)
     cont[i].x = cont[i].y*cont[i].z;
 }
 
