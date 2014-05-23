@@ -153,10 +153,20 @@ auto dot(V1 const & a, V2 const & b)  ->decltype(a.x()*b.x()) {
 
 
 
+
 template<typename T, int N>
 struct ExtVecTraits {
   typedef T __attribute__( ( vector_size( N*sizeof(T) ) ) ) type;
+  typedef T __attribute__( ( vector_size( N*sizeof(T) ), aligned(alignof(T)) ) ) typeA;
+
+  static type load(T const * p) { return *(typeA const *)(p);}
+  static void load(T *p, type const & v) { *(typeA *)(p) = v; }
+
+  static typeA & bind(T * p) { return *(typeA *)(p);}
+  static typeA & bind(T const * p) { return *(typeA const *)(p);}
 };
+
+
 
 template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::type;
 

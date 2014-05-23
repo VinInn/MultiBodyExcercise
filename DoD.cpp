@@ -80,9 +80,8 @@ void comp(Cont & cont) {
 
 template<typename Cont>
 void reset(Cont & cont) {
-  auto n = int(cont.size());
-#pragma GCC ivdep
-  for (auto i=0; i<n; ++i)
+  // #pragma GCC ivdep
+  for (auto i=0U; i<cont.size(); ++i)
     cont[i].reset();
 }
 
