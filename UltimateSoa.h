@@ -14,18 +14,20 @@ namespace details_UltimateSoa {
 
 template<typename T>
 struct UltimateSoaTraits {
+  using VAL =  typename T::VAL;
   using CREF = typename T::CREF;
   using REF =  typename T::REF;
   using SOATUPLE = typename T::SOATUPLE;
 };
 
-template<typename T, bool>
+template<typename T, bool=!std::is_arithmetic<T>::value>
 class UltimateSoa {};
 
 
 template<typename T>
 class UltimateSoa<T, true> {
 public:
+  using VAL =  typename UltimateSoaTraits<T>::VAL;
   using CREF = typename UltimateSoaTraits<T>::CREF;
   using REF =  typename UltimateSoaTraits<T>::REF;
   using Data = typename UltimateSoaTraits<T>::SOATUPLE;
@@ -61,6 +63,12 @@ public:
    return t2r_impl<CREF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
  }
 
+
+  static void swap(REF a, REF b) {
+    VAL tmp = a;
+    a = b; b=tmp;
+  } 
+
   Data data;
   unsigned int m_n=0;
 };
@@ -70,19 +78,30 @@ template<typename T>
 class UltimateSoa<T, false> : public details_UltimateSoa::AVector<T> {
 public:
   using Storage = details_UltimateSoa::AVector<T>;
-  /*
+  
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
-  using VAL = UltimateSoa <value,false>;
-  using CREF = UltimateSoa <value const &,false>;
-  using REF = UltimateSoa<ref,false>;
-  */  
-
+  using cref = typename std::add_lvalue_reference<typename std::add_const< T>::type>::type;
+  using VAL = value;
+  using CREF = cref;
+  using REF = ref;
+  
   template<typename ... Args>
   UltimateSoa(Args... args) : Storage(args...){}
 
+  static void swap(REF a, REF b) {
+    VAL tmp = a;
+    a = b; b=tmp;
+  } 
+
 };
 
+/* there is no way this can ever work...
+template<template<typename, bool> class UltimateSoa, typename T>
+void swap(typename UltimateSoa<T,true>::REF a, typename UltimateSoa<T,true>::REF b) {
+  UltimateSoa<T,true>::swap(a,b);
+}
+*/
 
 #endif
 

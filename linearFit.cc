@@ -70,7 +70,7 @@ template<typename T> using VecI4D = ExtVecI<T,4>;
 
 
 
-template<typename T> struct Point { T x,y,z, wx,wy;};
+template<typename T> struct Point { T x,y,z, wx,wy; T dum1,dum2;};
 
 template<typename T> 
 struct LinearFit{
@@ -96,20 +96,22 @@ struct LinearFit{
 
     auto tmp = w*xy;
     g += p.z*tmp;
-    s12 +=  __builtin_shuffle(tmp,VecI{1,1,3,3});
+    s12 += __builtin_shuffle(tmp,VecI{1,1,3,3});
     tmp*=xy;
-    snn +=__builtin_shuffle(tmp,VecI{1,0,3,2});
+    snn += __builtin_shuffle(tmp,VecI{1,0,3,2});
     /*
-    g[0] +=     (p.z * p.wx);
-    g[1] += p.x*(p.z * p.wx);
-    g[2] +=     (p.z * p.wy);
-    g[3] += p.y*(p.z * p.wy);
-    snn[1] += p.wx;
+    g[0] += p.z *      p.wx;
+    g[1] += p.z * (p.x*p.wx);
+    g[2] += p.z *      p.wy;
+    g[3] += p.z * (p.y*p.wy);
+
+    snn[1] +=          p.wx;
     snn[0] += p.x*(p.x*p.wx);
-    snn[3] += p.wy;
+    snn[3] +=          p.wy;
     snn[2] += p.y*(p.y*p.wy);
-    s12x += p.x*p.wx;
-    s12y += p.y*p.wy;
+
+    s12[0] = s12[1] += (p.x*p.wx);
+    s12[2] = s12[3] += (p.y*p.wy);
     */
 
   }
@@ -125,10 +127,33 @@ struct LinearFit{
 
     auto tmp = w*xy;
 
+    g   -= p.z*tmp;
     s12 -= __builtin_shuffle(tmp,VecI{1,1,3,3});
+    tmp*=xy;
     snn -= __builtin_shuffle(tmp,VecI{1,0,3,2});
  
   }
+
+
+  void remove2(Point<T> const & p) {
+    Vec w0 = ExtVecTraits<T,4>::load(&p.wx);  //can be very unsafe
+    Vec w{w0[0],w0[0],w0[1],w0[1]};
+
+
+    Vec one{T(1),T(1),T(1),T(1)};
+    Vec xy0 = ExtVecTraits<T,4>::load(&p.x);
+    Vec xy{one[0], xy0[0],one[1], xy0[1]};
+
+    auto tmp = w*xy;
+
+    g   -= p.z*tmp;
+    s12 -= __builtin_shuffle(tmp,VecI{1,1,3,3});
+    tmp*=xy;
+    snn -= __builtin_shuffle(tmp,VecI{1,0,3,2});
+ 
+  }
+
+
 
   void solve() {
     //  T dx = snn[1]*snn[0]; // - s12x*s12x;
@@ -139,6 +164,8 @@ struct LinearFit{
     Vec d =  __builtin_shuffle(snn,VecI{1,1,3,3})* __builtin_shuffle(snn,VecI{0,0,2,2});
     d -= s12*s12;
 
+    auto ad = (d< T(0)) ? -d : d;
+    d = (ad< T(10.e-10)) ? T(1) : d;
 
     // Vec g2{g[1],g[0],g[3],g[2]};
     Vec g2 = __builtin_shuffle(g,VecI{1,0,3,2});
@@ -148,9 +175,35 @@ struct LinearFit{
 };
 
 void add(Point<float> const & p, LinearFit<float> & f) { f.add(p);}
+void remove(Point<float> const & p, LinearFit<float> & f) { f.remove2(p);}
 void solve(LinearFit<float> & f) { f.solve();}
 
 
 
 void add(Point<double> const & p, LinearFit<double> & f) { f.add(p);}
 void solve(LinearFit<double> & f) { f.solve();}
+
+
+
+namespace atest {
+  typedef float __attribute__( ( vector_size( 4*sizeof(float) ) ) ) Vec;
+
+  Vec g; // gx1,gx2,gy1,gy2;
+  Vec snn; // sx22,sx11,sy22,sy11
+  Vec s12;  // T s12x, s12y;
+  
+  void add(Point<float> p ) {
+    g[0] += p.z *      p.wx;
+    g[1] += p.z * (p.x*p.wx);
+    g[2] += p.z *      p.wy;
+    g[3] += p.z * (p.y*p.wy);
+
+    snn[1] +=          p.wx;
+    snn[0] += p.x*(p.x*p.wx);
+    snn[3] +=          p.wy;
+    snn[2] += p.y*(p.y*p.wy);
+
+    s12[0] = s12[1] += (p.x*p.wx);
+    s12[2] = s12[3] += (p.y*p.wy);
+  }
+}

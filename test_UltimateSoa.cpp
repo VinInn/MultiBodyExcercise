@@ -3,11 +3,13 @@
 
 template<typename T>
 struct Vect {
-  using value = typename std::remove_reference<T>::type;
-  using ref = typename std::add_lvalue_reference<T>::type;
+  using value = typename std::remove_const<typename std::remove_reference<T>::type>::type;
+  using  ref = typename std::add_lvalue_reference<T>::type;
+  using cref = typename std::add_lvalue_reference<typename std::add_const< T>::type>::type;
   using CREF = Vect<value const &>;
   using REF = Vect<ref>;
-  using SOATUPLE = std::tuple<UltimateSoa<T,false>,UltimateSoa<T,false>,UltimateSoa<T,false>>;
+  using VAL = Vect<value>;
+  using SOATUPLE = std::tuple<UltimateSoa<T>,UltimateSoa<T>,UltimateSoa<T>>;
 
   Vect() {}
   Vect(T ix, T iy, T iz, int k=0) : x(ix),y(iy),z(iz){}
@@ -48,8 +50,9 @@ struct UltimateSoaTraits<Line<T>> {
   using ref = typename std::add_lvalue_reference<T>::type;
   using CREF = Line<value const &>;
   using REF = Line<ref>;
+  using VAL = Line<value>;
   using V = Vect<T>;
-  using SOATUPLE = std::tuple<UltimateSoa<V,true>, UltimateSoa<V,true>>;
+  using SOATUPLE = std::tuple<UltimateSoa<V>, UltimateSoa<V>>;
 };
 
 
@@ -58,12 +61,27 @@ struct UltimateSoaTraits<Line<T>> {
 #include <iostream>
 int main() {
 
-  UltimateSoa<float,false>  f(10);
+  UltimateSoa<float>  f(10);
 
-  UltimateSoa<Vect<float>,true> vv(10);
+  UltimateSoa<Vect<float>> vv(10);
 
-  UltimateSoa<Line<float>,true> vl(10);
+  UltimateSoa<Line<float>> vl(10);
 
+  using V = Vect<float>;
+  using L = Line<float>;
+
+  for (auto i=0U; i<vl.size(); ++i) {
+    auto val = float(i);
+    vl[i] = L(V{val,val,val},V{val,val,val});
+  }
+
+  std::cout << vl[4].p.y << std::endl;
+  std::cout << vl[7].p.y << std::endl;
+
+  UltimateSoa<Line<float>>::swap(vl[4],vl[7]);
+
+  std::cout << vl[4].p.y << std::endl;
+  std::cout << vl[7].p.y << std::endl;
 
   return (f[2]<0) & (vv[5].x>0) & (vl[3].p.y> vl[2].c.z);
 
