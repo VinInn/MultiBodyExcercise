@@ -213,6 +213,17 @@ auto dot(V1 const & a, V2 const & b)  ->decltype(a[0]*b[0]) {
   for (auto i=0U; i<4; ++i) r+=a[i]*b[i];
   return r;
 }
+ 
+template<typename V1>
+V1 max(V1 a, V1 b) {
+  return (a>b) ? a : b;
+}
+
+template<typename V1>
+V1 abs(V1 a) {
+  return (a>0) ? a : -a;
+}
+
 #endif
 
 
@@ -264,9 +275,10 @@ template<typename T>
 std::ostream & operator<<(std::ostream & co, Vector3D<T> const & v) {
   return co << '('<< v.x() <<',' << v.y() <<',' <<  v.z() <<')';  
 }
-#include<ostream>
-template<typename T>
-std::ostream & operator<<(std::ostream & co, Vec4D<T> const & v) {
+std::ostream & operator<<(std::ostream & co, Vec4D<float> const & v) {
+  return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
+}
+std::ostream & operator<<(std::ostream & co, Vec4D<double> const & v) {
   return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
 }
 
@@ -279,9 +291,10 @@ public:
   using R3D = Vector3D<T&>;
   using C3D = Vector3D<T const&>;
 
-
+  SOA3D(){}
   explicit SOA3D(unsigned int is) : vx(is),vy(is),vz(is){}
-  
+  void resize(unsigned int n) { vx.resize(n);vy.resize(n);vz.resize(n);}  
+
   R3D operator[](unsigned int i) { return R3D(vx[i],vy[i],vz[i]); }
   C3D operator[](unsigned int i) const { return C3D(vx[i],vy[i],vz[i]); }
   

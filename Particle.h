@@ -79,8 +79,10 @@ public:
   using Soa = SOA3D<Float>;
   using uint = unsigned int;
 
+  Particles(){}
   explicit Particles(uint n) : m_pos(n), m_vel(n),m_acc(n),m_mass(n), m_charge(n), m_n(n){} 
 
+  void resize(uint n) { m_pos.resize(n); m_vel.resize(n); m_acc.resize(n); m_mass.resize(n); m_charge.resize(n); m_n=n;} 
   uint size() const { return m_n;}
 
   CP operator[](uint i) const { return CP(m_mass[i],m_pos[i],m_vel[i],m_acc[i]); }
