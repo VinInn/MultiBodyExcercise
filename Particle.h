@@ -44,8 +44,8 @@ public:
   T3D & acceleration() { return m_acc;}
 
   void update(value dt=value(1)) {
-    auto a =  dt*dt*m_acc*value(0.5);
-    m_pos += m_vel + a;
+    auto a =  value(0.5)*dt*dt*m_acc;
+    m_pos += dt*m_vel + a;
     m_vel += dt*m_acc;
 
   }

@@ -14,22 +14,29 @@
 int 
 main(int argc, char* argv[]){
   
-    using Float = float;
-  // using Float = double;
+  //  using Float = float;
+  using Float = double;
 
   using V3D = Vector3D<Float>;
   using Part = Particle<Float>;
 
   std::vector<Part> particles;
 
-  if (argc != 2) {
-    std::cout << "please provide number of bodies\n" << std::endl;
+  if (argc < 2) {
+    std::cout << "please provide number of bodies, time step, coupling-costant\n" << std::endl;
     exit(-1);
   }
   
+
   unsigned int nBody = ::atoi(argv[1]);
 
-  std::cout << "start " << nBody << std::endl;
+  Float deltaT = 1.f;
+  Float fact = 1.e-8;
+
+  if (argc > 2) deltaT = ::atof(argv[2]);
+  if (argc > 3) fact = 1.e-9*::atof(argv[3]);
+
+  std::cout << "start " << nBody << ' ' << deltaT << ' ' << fact<< std::endl;
 
   particles.resize(nBody);
 
@@ -51,13 +58,13 @@ main(int argc, char* argv[]){
   V3D forceTot=zeroV;
   auto iprobe = 15U;
   particles[iprobe].position() = zeroV;
-  std::cout << "time/position " << t << ' ' << particles[iprobe].position() << std::endl;
+  std::cout << "time/position " << t << ' ' << particles[iprobe].position()
+	    << ' ' << particles[iprobe].velocity()<< std::endl;
 
 
-  for(auto k=0U; k<1000; ++k) {
+  for(auto k=0U; k<(unsigned int)(1000/deltaT); ++k) {
     auto force = [=](auto a, auto b) -> V3D {
       constexpr Float eps = 0.0001;
-      constexpr Float fact = .1e-7;
       
       auto && delta = b.position()-a.position();
       // very long range force
@@ -68,7 +75,7 @@ main(int argc, char* argv[]){
       // return delta*(Float(10)*fact/d2);
       // coulomb
       auto d2 = dist2(b.position(),a.position())+eps;
-      return delta*(-fact/(std::sqrt(d2)*d2));
+      return delta*(fact/(std::sqrt(d2)*d2));
       
     };
     t -= rdtscp();
@@ -76,18 +83,21 @@ main(int argc, char* argv[]){
     for (auto i=0U; i< nBody; ++i) 
       forceTot += force(particles[i],particles[iprobe]);
     particles[iprobe].acceleration()=forceTot;
-    particles[iprobe].update();
+    particles[iprobe].update(deltaT);
     t +=rdtscp();
 
    if (1==k%100){
      std::cout << "time/force " << t << ' ' << forceTot << std::endl;
-     std::cout << "time/position " << t << ' ' << particles[iprobe].position() << std::endl;
+     std::cout << "time/position " << t << ' ' << particles[iprobe].position() 
+	       << ' ' << particles[iprobe].velocity()<< std::endl;
    }
 
   }
   
-  std::cout << "time/force " << t << ' ' << forceTot << std::endl;
-  std::cout << "time/position " << t << ' ' << particles[iprobe].position() << std::endl;
+  std::cout  << std::endl << "time/force " << t << ' ' << forceTot << std::endl;
+  std::cout << "time/position " << t << ' ' << particles[iprobe].position() 
+	    << ' ' << particles[iprobe].velocity()<< std::endl;
+ 
 
   return 0;
 };
