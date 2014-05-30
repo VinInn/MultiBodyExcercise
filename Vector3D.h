@@ -72,6 +72,12 @@ public:
     return *this;
   }
 
+  template<typename V>
+  Vector3D<T> & operator/=(V b) {
+    xi/=b.x(); yi/=b.y(); zi/=b.z(); // wi*=b.wi;
+    return *this;
+  }
+
 
   Vector3D<T> & operator*=(value b) {
     xi*=b; yi*=b; zi*=b;  // wi*=b;
@@ -117,6 +123,15 @@ operator*(Vector3D<T1> a, Vector3D<T2> b) {
   V r=a; return r*=b;
 }
 
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_reference<T1>::type> 
+operator/(Vector3D<T1> a, Vector3D<T2> b) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  V r=a; return r/=b;
+}
+
+
 
 template<typename T1, typename T2>
 inline
@@ -153,8 +168,21 @@ auto dot(V1 const & a, V2 const & b)  ->decltype(a.x()*b.x()) {
   return a.x()*b.x() + a.y()*b.y() + a.z()*b.z();
 }
 
+template<typename T1, typename T2>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
+max(Vector3D<T1> a, Vector3D<T2> b) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  return V(std::max(a.x(),b.x()),std::max(a.y(),b.y()),std::max(a.z(),b.z()));
+}
 
-
+template<typename T1>
+inline
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
+abs(Vector3D<T1> a) {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+  return V(std::abs(a.x()),std::abs(a.y()),std::abs(a.z()));
+}
 
 
 template<typename T, int N>

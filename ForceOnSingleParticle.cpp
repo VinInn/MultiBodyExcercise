@@ -56,13 +56,16 @@ main(int argc, char* argv[]){
 
   long long t = 0;
   V3D forceTot=zeroV;
+  V3D maxDA = zeroV;
+  Float maxDV=zero;
+  Float aveDV=zero;
   auto iprobe = 15U;
   particles[iprobe].position() = zeroV;
   std::cout << "time/position " << t << ' ' << particles[iprobe].position()
 	    << ' ' << particles[iprobe].velocity()<< std::endl;
 
-
-  for(auto k=0U; k<(unsigned int)(1000/deltaT); ++k) {
+  auto nLoop = (unsigned int)(1000/deltaT);
+  for(auto k=0U; k<nLoop; ++k) {
     auto force = [=](auto a, auto b) -> V3D {
       constexpr Float eps = 0.0001;
       
@@ -82,6 +85,12 @@ main(int argc, char* argv[]){
     forceTot=zeroV;
     for (auto i=0U; i< nBody; ++i) 
       forceTot += force(particles[i],particles[iprobe]);
+    if(k>10) {
+      auto dd = abs((forceTot-particles[iprobe].acceleration())/mag(particles[iprobe].velocity()));
+      maxDA = max(maxDA,dd);
+      maxDV = std::max(maxDV,mag(dd));
+      aveDV +=mag(dd);
+    }
     particles[iprobe].acceleration()=forceTot;
     particles[iprobe].update(deltaT);
     t +=rdtscp();
@@ -89,14 +98,17 @@ main(int argc, char* argv[]){
    if (1==k%100){
      std::cout << "time/force " << t << ' ' << forceTot << std::endl;
      std::cout << "time/position " << t << ' ' << particles[iprobe].position() 
-	       << ' ' << particles[iprobe].velocity()<< std::endl;
+	       << ' ' << particles[iprobe].velocity()
+	       << ' ' << mag(particles[iprobe].velocity())
+	       << std::endl;
    }
 
   }
   
-  std::cout  << std::endl << "time/force " << t << ' ' << forceTot << std::endl;
+  std::cout  << std::endl << "time/force/maxDA " << t << ' ' << forceTot
+	     << ' '<< deltaT*maxDA << ' '<< deltaT*maxDV << ' '<< deltaT*aveDV/nLoop  << std::endl;
   std::cout << "time/position " << t << ' ' << particles[iprobe].position() 
-	    << ' ' << particles[iprobe].velocity()<< std::endl;
+	    << ' ' << particles[iprobe].velocity() << ' ' << mag(particles[iprobe].velocity())<< std::endl;
  
 
   return 0;
