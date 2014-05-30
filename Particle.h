@@ -36,16 +36,17 @@ public:
 
 
   value mass() const { return m_mass;}
+  T3D & position() { return m_pos;}
   T3D const & position() const { return m_pos;}
   T3D const & velocity() const { return m_vel;}
 
   T3D const & acceleration() const { return m_acc;}
   T3D & acceleration() { return m_acc;}
 
-  void update() {
-    C3D a =  m_acc*value(0.5);
+  void update(value dt=value(1)) {
+    auto a =  dt*dt*m_acc*value(0.5);
     m_pos += m_vel + a;
-    m_vel += m_acc;
+    m_vel += dt*m_acc;
 
   }
 
@@ -61,6 +62,7 @@ private:
   T3D m_vel;
   T3D m_acc;
   T m_mass;
+  // T m_charge;
 
 };
 
@@ -77,7 +79,7 @@ public:
   using Soa = SOA3D<Float>;
   using uint = unsigned int;
 
-  explicit Particles(uint n) : m_pos(n), m_vel(n),m_acc(n),m_mass(n), m_n(n){} 
+  explicit Particles(uint n) : m_pos(n), m_vel(n),m_acc(n),m_mass(n), m_charge(n), m_n(n){} 
 
   uint size() const { return m_n;}
 
@@ -91,6 +93,7 @@ private:
   Soa m_vel;
   Soa m_acc;
   AVector<Float> m_mass;
+  AVector<Float> m_charge;
   uint m_n;
 
 };

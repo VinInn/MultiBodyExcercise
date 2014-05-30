@@ -14,6 +14,7 @@
 
 
 #include <omp.h>
+#include "rdtscp.h"
 
 
 int 

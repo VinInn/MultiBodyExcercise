@@ -62,15 +62,18 @@ void Box::computeForce() {
   
   auto force = [=](auto a, auto b) -> V3D {
     constexpr Float eps = 0.0001;
-    constexpr Float fact = .1e-6;
+    constexpr Float fact = .1e-7;
     
     auto && delta = b.position()-a.position();
-    // long range force
+    // very long range force
     // auto d = dist(b.position(),a.position())+eps;
     // return delta*(fact/(d*std::sqrt(d)));
-    // short range force
+    // long range force
+    // auto d2 = dist2(b.position(),a.position())+eps;
+    // return delta*(Float(10)*fact/d2);
+    // coulomb
     auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*(Float(10)*fact/d2);
+    return delta*(fact/(std::sqrt(d2)*d2));
 
   };
   

@@ -26,13 +26,13 @@ public:
   using REF = Vector3D<ref>;
 
 
-  Vector3D(){}
-  Vector3D(T ix, T iy, T iz) : xi(ix), yi(iy), zi(iz) {}
+  constexpr Vector3D(){}
+  constexpr Vector3D(T ix, T iy, T iz) : xi(ix), yi(iy), zi(iz) {}
   template<typename V>
-  Vector3D(V v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
+  constexpr Vector3D(V v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
   template<typename V>
   Vector3D & operator=(V v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
-  Vector3D(Vector3D const & v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
+  constexpr Vector3D(Vector3D const & v) : xi(v.x()), yi(v.y()), zi(v.z()) {}
   Vector3D & operator=(Vector3D const & v) { xi = v.x();  yi=v.y(); zi=v.z(); return *this;}
  
   
@@ -93,7 +93,8 @@ public:
 
 template<typename T1, typename T2>
 inline
-Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type> operator+(Vector3D<T1> a, Vector3D<T2> b) {
+Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type> 
+operator+(Vector3D<T1> a, Vector3D<T2> b) {
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   //  return V(a.x()+b.x(),a.y()+b.y(),a.z()+b.z());
   V r=a; return r+=b;
@@ -101,7 +102,8 @@ Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::t
 
 template<typename T1, typename T2>
 inline
-Vector3D<typename std::remove_reference<T1>::type> operator-(Vector3D<T1> a, Vector3D<T2> b) {
+Vector3D<typename std::remove_reference<T1>::type> 
+operator-(Vector3D<T1> a, Vector3D<T2> b) {
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   //  return V(a.x()-b.x(),a.y()-b.y(),a.z()-b.z());
   V r=a; return r-=b;
@@ -109,7 +111,8 @@ Vector3D<typename std::remove_reference<T1>::type> operator-(Vector3D<T1> a, Vec
 
 template<typename T1, typename T2>
 inline
-Vector3D<typename std::remove_reference<T1>::type> operator*(Vector3D<T1> a, Vector3D<T2> b) {
+Vector3D<typename std::remove_reference<T1>::type> 
+operator*(Vector3D<T1> a, Vector3D<T2> b) {
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   V r=a; return r*=b;
 }
@@ -226,6 +229,17 @@ namespace vect3d {
 
   };
 
+}
+
+#include<ostream>
+template<typename T>
+std::ostream & operator<<(std::ostream & co, Vector3D<T> const & v) {
+  return co << '('<< v.x() <<',' << v.y() <<',' <<  v.z() <<')';  
+}
+#include<ostream>
+template<typename T>
+std::ostream & operator<<(std::ostream & co, Vec4D<T> const & v) {
+  return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
 }
 
 
