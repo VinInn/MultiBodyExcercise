@@ -6,3 +6,8 @@
 set term png
 set output 'probeTrajectory.png'
 plot 'probeTraj10.txt' with lines, 'probeTraj1.txt'with lines,  'probeTraj01.txt' with lines,  'probeTraj05.txt' with lines
+
+
+
+time  ./a.out 100000 0.001 -100. probeTraj001.txt | tail -3
+

@@ -73,14 +73,20 @@ main(int argc, char* argv[]){
     auto && delta = b.position()-a.position();
     // very long range force
     // auto d = dist(b.position(),a.position())+eps;
-      // return delta*(fact/(d*std::sqrt(d)));
-      // long range force
-      // auto d2 = dist2(b.position(),a.position())+eps;
-      // return delta*(Float(10)*fact/d2);
-      // coulomb
-    auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*(fact/(std::sqrt(d2)*d2));
+    // return delta*(fact/(d*std::sqrt(d)));
     
+    // long range force
+    auto d2 = dist2(b.position(),a.position())+eps;
+    return delta*fact/d2;
+    
+    // coulomb
+    //auto d2 = dist2(b.position(),a.position())+eps;
+    //return delta*(fact/(std::sqrt(d2)*d2));
+
+    // spring
+    // return delta*fact;
+    
+
   };
   
 
@@ -97,6 +103,7 @@ main(int argc, char* argv[]){
   }
   
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
+
   for(auto k=0U; k<nLoop; ++k) {
     t -= rdtscp();
     V3D forceT=zeroV;
@@ -125,8 +132,12 @@ main(int argc, char* argv[]){
 	       << ' ' << mag(particles[iprobe].velocity())
 	       << std::endl;
    }
-   probeTraj << particles[iprobe].position().x()  << ' '<< particles[iprobe].position().y()  << ' '<< particles[iprobe].position().z() << '\n';
 
+#ifdef USEVECEXT
+   probeTraj << particles[iprobe].position()[0]  << ' '<< particles[iprobe].position()[1]  << ' '<< particles[iprobe].position()[2] << '\n';
+#else
+   probeTraj << particles[iprobe].position().x()  << ' '<< particles[iprobe].position().y()  << ' '<< particles[iprobe].position().z() << '\n';
+#endif
    
   }
   

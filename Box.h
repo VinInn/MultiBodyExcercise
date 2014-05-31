@@ -68,12 +68,17 @@ void Box::computeForce() {
     // very long range force
     // auto d = dist(b.position(),a.position())+eps;
     // return delta*(fact/(d*std::sqrt(d)));
+    
     // long range force
-    // auto d2 = dist2(b.position(),a.position())+eps;
-    // return delta*(Float(10)*fact/d2);
-    // coulomb
     auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*(fact/(std::sqrt(d2)*d2));
+    return delta*fact/d2;
+
+    // coulomb
+    // auto d2 = dist2(b.position(),a.position())+eps;
+    // return delta*(fact/(std::sqrt(d2)*d2));
+
+    // spring
+    // return delta*fact;
 
   };
   

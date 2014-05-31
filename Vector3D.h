@@ -272,12 +272,15 @@ namespace vect3d {
 
 #include<ostream>
 template<typename T>
+inline
 std::ostream & operator<<(std::ostream & co, Vector3D<T> const & v) {
   return co << '('<< v.x() <<',' << v.y() <<',' <<  v.z() <<')';  
 }
+inline
 std::ostream & operator<<(std::ostream & co, Vec4D<float> const & v) {
   return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
 }
+inline
 std::ostream & operator<<(std::ostream & co, Vec4D<double> const & v) {
   return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
 }
