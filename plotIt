@@ -1,0 +1,8 @@
+./a.out 100000 0.1 -10. probeTraj10.txt | tail -n 3
+./a.out 100000 0.01 -10. probeTraj1.txt | tail -n 3
+./a.out 100000 0.001 -10. probeTraj01.txt | tail -n 3
+./a.out 100000 0.0005 -10. probeTraj05.txt | tail -n 3
+
+set term png
+set output 'probeTrajectory.png'
+plot 'probeTraj10.txt' with lines, 'probeTraj1.txt'with lines,  'probeTraj01.txt' with lines,  'probeTraj05.txt' with lines

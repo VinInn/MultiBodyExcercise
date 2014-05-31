@@ -10,6 +10,7 @@
 #include "rdtscp.h"
 
 
+#include<fstream>
 
 int 
 main(int argc, char* argv[]){
@@ -24,7 +25,7 @@ main(int argc, char* argv[]){
   Particles particles;
 
   if (argc < 2) {
-    std::cout << "please provide number of bodies, time step, coupling-costant\n" << std::endl;
+    std::cout << "please provide number of bodies, time step, coupling-costant, file name\n" << std::endl;
     exit(-1);
   }
   
@@ -95,7 +96,7 @@ main(int argc, char* argv[]){
     particles[iprobe].update(k<50 ? 0.1 : 0.5f);
   }
   
-
+  std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
   for(auto k=0U; k<nLoop; ++k) {
     t -= rdtscp();
     V3D forceT=zeroV;
@@ -124,7 +125,9 @@ main(int argc, char* argv[]){
 	       << ' ' << mag(particles[iprobe].velocity())
 	       << std::endl;
    }
+   probeTraj << particles[iprobe].position().x()  << ' '<< particles[iprobe].position().y()  << ' '<< particles[iprobe].position().z() << '\n';
 
+   
   }
   
   std::cout  << std::endl << "time/force/maxDA " << t << ' ' << forceTot
@@ -134,6 +137,5 @@ main(int argc, char* argv[]){
   std::cout << "time/position " << double(t)/nLoop << ' ' << particles[iprobe].position() 
 	    << ' ' << particles[iprobe].velocity() << ' ' << mag(particles[iprobe].velocity())<< std::endl;
  
-
   return 0;
 };
