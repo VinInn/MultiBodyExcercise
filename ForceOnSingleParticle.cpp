@@ -85,15 +85,14 @@ main(int argc, char* argv[]){
 
   auto nLoop = (unsigned int)(1000/deltaT);
 
-  // heat up
-  
-  for(auto k=0U; k<nLoop/10; ++k) {
-    forceTot=zeroV;
+  // warm up
+  // set initial conditions: give a deterministic "shake"
+  for(auto k=0U; k<500; ++k) {
+    V3D forceT=zeroV;
     for (auto i=0U; i< nBody; ++i) 
-      forceTot += force(particles[i],particles[iprobe]);
-    particles[iprobe].acceleration()=forceTot;
-    particles[iprobe].update(deltaT);
-
+      forceT += force(particles[i],particles[iprobe]);
+    particles[iprobe].acceleration()=forceT;
+    particles[iprobe].update(k<50 ? 0.1 : 0.5f);
   }
   
 
