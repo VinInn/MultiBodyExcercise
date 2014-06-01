@@ -39,6 +39,7 @@ public:
   T3D & position() { return m_pos;}
   T3D const & position() const { return m_pos;}
   T3D const & velocity() const { return m_vel;}
+  T3D & velocity() { return m_vel;}
 
   T3D const & acceleration() const { return m_acc;}
   T3D & acceleration() { return m_acc;}

@@ -9,7 +9,7 @@ template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 
 // #define USEDOUBLE
 
-#define  USESOA
+// #define  USESOA
 
 #ifndef USESOA
 #define USEVECEXT
