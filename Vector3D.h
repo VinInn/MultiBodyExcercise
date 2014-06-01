@@ -7,10 +7,12 @@
 
 template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 
+// #define USEDOUBLE
+
 #define  USESOA
 
 #ifndef USESOA
-// #define USEVECEXT
+#define USEVECEXT
 #endif
 
 
@@ -253,7 +255,11 @@ auto dist(V1 const & a, V2 const & b) ->decltype(dist2(a,b)){
 
 
 namespace vect3d {
+#ifdef  USEDOUBLE
+  using Float = double;
+#else
   using Float = float;
+#endif
 
   constexpr float zerof=0.; 
   constexpr float zerod=0.; 

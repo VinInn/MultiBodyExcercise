@@ -1,0 +1,2 @@
+c++ -std=c++1y -Ofast -fopenmp -Wall ForceOnSingleParticle.cpp --param vect-max-version-for-alias-checks=100 -ftree-loop-if-convert-stores -fopt-info-vec -march=nehalem
+
