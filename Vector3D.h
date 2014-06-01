@@ -12,7 +12,7 @@ template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 // #define  USESOA
 
 #ifndef USESOA
-#define USEVECEXT
+// #define USEVECEXT
 #endif
 
 
@@ -47,6 +47,7 @@ public:
   ref y() { return yi;}
   ref z() { return zi;}
 
+#ifdef USESOA
   value operator[](unsigned int k) const {
     return (k==0) ? x() :( k==1 ? y() : z()); 
   }
@@ -54,6 +55,15 @@ public:
   ref operator[](unsigned int k) {
     return (k==0) ? x() :( k==1 ? y() : z()); 
   }
+#else
+  cref operator[](unsigned int k) const {
+    return *((&xi)+k);
+  }
+
+  ref operator[](unsigned int k) {
+    return  *((&xi)+k);
+  }
+#endif
 
 
   template<typename V>

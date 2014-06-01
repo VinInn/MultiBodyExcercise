@@ -80,20 +80,19 @@ main(int argc, char* argv[]){
     for (auto i=0U; i< nBody; ++i) {
       particles[i].update(deltaT);
       
-      /*
+      
       for (unsigned int k=0; k<3; ++k) {
 	if (particles[i].position()[k] > wallPos) particles[i].scatter(k,wallPos);
 	if (particles[i].position()[k] < -wallPos) particles[i].scatter(k,-wallPos);
       }
-      */
+           
       
-      
-      
+#ifdef  USEVECEXT
       auto p = abs(particles[i].position());
       particles[i].velocity() = (p<wallPos) ? particles[i].velocity() : -particles[i].velocity();
       p = (p<wallPos) ? p : (wallPos - (p-wallPos));
       particles[i].position() = (particles[i].position()>0) ? p : -p;
-      
+#endif
 
     }
     t +=rdtscp();
