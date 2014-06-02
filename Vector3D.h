@@ -4,15 +4,19 @@
 #include<type_traits>
 #include "align_allocator.h"
 #include<vector>
+#include <x86intrin.h>
 
 template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
+
+
+
 
 // #define USEDOUBLE
 
 // #define  USESOA
 
 #ifndef USESOA
-// #define USEVECEXT
+#define USEVECEXT
 #endif
 
 
@@ -180,6 +184,7 @@ auto dot(V1 const & a, V2 const & b)  ->decltype(a.x()*b.x()) {
   return a.x()*b.x() + a.y()*b.y() + a.z()*b.z();
 }
 
+
 template<typename T1, typename T2>
 inline
 Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
@@ -197,6 +202,17 @@ abs(Vector3D<T1> a) {
 }
 
 
+
+//-------------------------------------------
+
+template<typename T>
+struct IntType { using type = T; };
+template<>
+struct IntType<float> { using type = int; };
+template<>
+struct IntType<double> {  using type = long long;};
+
+
 template<typename T, int N>
 struct ExtVecTraits {
   typedef T __attribute__( ( vector_size( N*sizeof(T) ) ) ) type;
@@ -207,14 +223,18 @@ struct ExtVecTraits {
 
   static typeA & bind(T * p) { return *(typeA *)(p);}
   static typeA & bind(T const * p) { return *(typeA const *)(p);}
+
+ typedef typename IntType<T>::type __attribute__( ( vector_size( N*sizeof(typename IntType<T>::type) ) ) ) itype;
+
 };
 
 
 
 template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::type;
+template<typename T, int N> using ExtVecI =  typename ExtVecTraits<T,N>::itype;
 
 template<typename T> using Vec4D = ExtVec<T,4>;
-
+template<typename T> using IVec4D = ExtVecI<T,4>;
 
 
 
@@ -235,6 +255,18 @@ template<typename V1>
 V1 abs(V1 a) {
   return (a>0) ? a : -a;
 }
+
+#ifdef __SSE2__
+int mask(Vec4D<float> m) {
+  return _mm_movemask_ps(m);
+}
+#endif
+
+#ifdef __AVX2__
+long long mask(Vec4D<double> m) {
+  _mm256_movemask_pd(m);
+}
+#endif
 
 #endif
 

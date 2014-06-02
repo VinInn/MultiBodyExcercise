@@ -22,10 +22,10 @@ main(int argc, char* argv[]){
   using V3D = Part::V3D;
 
   // std::vector<Part> particles;
-  Particles particles;
+  Particles particles;  // "vector of particles"
 
   if (argc < 2) {
-    std::cout << "please provide number of bodies, time step, coupling-costant, file name\n" << std::endl;
+    std::cout << "please provide number of particles, time step, coupling-costant, file name\n" << std::endl;
     exit(-1);
   }
   
@@ -47,8 +47,8 @@ main(int argc, char* argv[]){
   std::mt19937 eng;
   std::uniform_real_distribution<float> rgen(-wallPos,wallPos);
 
-  Float zero = 0;
-  const V3D zeroV{zero,zero,zero};
+  constexpr Float zero = 0;
+  constexpr V3D zeroV{zero,zero,zero};
   constexpr Float mass = 1.;
 
   constexpr Float speed = 0.05;
@@ -60,14 +60,16 @@ main(int argc, char* argv[]){
 
   long long t = 0;
 
+
+  // "probe particle"  (just one)
   auto iprobe = 15U;
   particles[iprobe].position() = zeroV;
-  std::cout << "time/position " << t << ' ' << particles[iprobe].position()
+  std::cout << "time/position/velocity " << t << ' ' << particles[iprobe].position()
 	    << ' ' << particles[iprobe].velocity()<< std::endl;
 
 
   auto force = [=](auto a, auto b) -> V3D {
-    return zeroV;
+    return fact*V3D{0,0,0};
   };
 
 
@@ -76,11 +78,12 @@ main(int argc, char* argv[]){
   // warm up
   // set initial conditions: give a deterministic "shake"
   for(auto k=0U; k<500; ++k) {
+    auto dt = k<50 ? 0.1 : 0.5f;
     V3D forceT=zeroV;
     for (auto i=0U; i< nBody; ++i) 
       forceT += force(particles[i],particles[iprobe]);
     particles[iprobe].acceleration()=forceT;
-    particles[iprobe].update(k<50 ? 0.1 : 0.5f);
+    particles[iprobe].update(dt);
   }
 
   Float aveV=zero;
@@ -90,7 +93,6 @@ main(int argc, char* argv[]){
   for(auto k=0U; k<nLoop; ++k) {
     t -= rdtscp();
     V3D forceT=zeroV;
-#pragma GCC ivdep
     for (auto i=0U; i< nBody; ++i) 
       forceT -= force(particles[iprobe],particles[i]);
  
