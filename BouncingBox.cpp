@@ -85,10 +85,19 @@ main(int argc, char* argv[]){
       
       // #ifdef  USESOA
 #ifndef  USEVECEXT
+	/*
       for (unsigned int k=0; k<3; ++k) {
 	if (part.position()[k] > wallPos) part.scatter(k,wallPos);
 	if (part.position()[k] < -wallPos) part.scatter(k,-wallPos);
-      }
+	}*/
+
+	if (part.position().x() > wallPos) part.scatter(0,wallPos);
+	if (part.position().x() < -wallPos) part.scatter(0,-wallPos);
+	if (part.position().y() > wallPos) part.scatter(1,wallPos);
+	if (part.position().y() < -wallPos) part.scatter(1,-wallPos);
+	if (part.position().z() > wallPos) part.scatter(2,wallPos);
+	if (part.position().z() < -wallPos) part.scatter(2,-wallPos);
+
            
 #else
       auto p = extvec::abs(part.position());
