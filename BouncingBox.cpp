@@ -82,6 +82,7 @@ main(int argc, char* argv[]){
       // PartV part; part.load(particles[i].mass(), particles[i].position(), particles[i].velocity(), particles[i].acceleration());
       auto && part = particles[i];
       part.update(deltaT);
+      // part.position()+=deltaT*part.velocity();
       
       // #ifdef  USESOA
 #ifndef  USEVECEXT
