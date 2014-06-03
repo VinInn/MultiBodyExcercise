@@ -263,8 +263,15 @@ int mask(Vec4D<float> m) {
 #endif
 
 #ifdef __AVX2__
-long long mask(Vec4D<double> m) {
-  _mm256_movemask_pd(m);
+int mask(Vec4D<double> m) {
+ return  _mm256_movemask_pd(m);
+}
+#elif __SSE2__
+int mask(Vec4D<double> m) {
+  typedef double __attribute__( ( vector_size( 2*sizeof(double) ) ) ) V2D;
+  V2D & l = (V2D&)(m[0]);
+  V2D & h = (V2D&)(m[2]);
+  return _mm_movemask_pd(l) | (_mm_movemask_pd(h)<<2);
 }
 #endif
 
