@@ -232,7 +232,7 @@ namespace extvec {
   
   
   
-  template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::type;
+  template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::typeA;
   template<typename T, int N> using ExtVecI =  typename ExtVecTraits<T,N>::itype;
   
   template<typename T> using Vec4D = ExtVec<T,4>;
