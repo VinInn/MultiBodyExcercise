@@ -11,7 +11,7 @@ template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 
 // #define USEDOUBLE
 
-#define  USESOA
+// #define  USESOA
 
 #ifndef USESOA
 #define USEVECEXT
@@ -203,79 +203,83 @@ abs(Vector3D<T1> a) {
 
 //-------------------------------------------
 
-template<typename T>
-struct IntType { using type = T; };
-template<>
-struct IntType<float> { using type = int; };
-template<>
-struct IntType<double> {  using type = long long;};
 
+namespace extvec {
 
-template<typename T, int N>
-struct ExtVecTraits {
-  typedef T __attribute__( ( vector_size( N*sizeof(T) ) ) ) type;
-  typedef T __attribute__( ( vector_size( N*sizeof(T) ), aligned(alignof(T)) ) ) typeA;
+  template<typename T>
+  struct IntType { using type = T; };
+  template<>
+  struct IntType<float> { using type = int; };
+  template<>
+  struct IntType<double> {  using type = long long;};
+  
+  
+  template<typename TT, int N>
+  struct ExtVecTraits {
+    using T = typename std::remove_const<typename std::remove_reference<TT>::type>::type;
+    typedef T __attribute__( ( vector_size( N*sizeof(T) ) ) ) type;
+    typedef T __attribute__( ( vector_size( N*sizeof(T) ), aligned(alignof(T)) ) ) typeA;
+    
+    static type load(T const * p) { return *(typeA const *)(p);}
+    static void load(T *p, type const & v) { *(typeA *)(p) = v; }
+    
+    static typeA & bind(T * p) { return *(typeA *)(p);}
+    static typeA & bind(T const * p) { return *(typeA const *)(p);}
+    
+    typedef typename IntType<T>::type __attribute__( ( vector_size( N*sizeof(typename IntType<T>::type) ) ) ) itype;
 
-  static type load(T const * p) { return *(typeA const *)(p);}
-  static void load(T *p, type const & v) { *(typeA *)(p) = v; }
-
-  static typeA & bind(T * p) { return *(typeA *)(p);}
-  static typeA & bind(T const * p) { return *(typeA const *)(p);}
-
- typedef typename IntType<T>::type __attribute__( ( vector_size( N*sizeof(typename IntType<T>::type) ) ) ) itype;
-
-};
-
-
-
-template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::type;
-template<typename T, int N> using ExtVecI =  typename ExtVecTraits<T,N>::itype;
-
-template<typename T> using Vec4D = ExtVec<T,4>;
-template<typename T> using IVec4D = ExtVecI<T,4>;
-
-
-
-#ifdef USEVECEXT
-template<typename V1,typename V2 >
-auto dot(V1 const & a, V2 const & b)  ->decltype(a[0]*b[0]) {
-  decltype(a[0]*b[0]) r=0;
-  for (auto i=0U; i<4; ++i) r+=a[i]*b[i];
-  return r;
-}
- 
-template<typename V1>
-V1 max(V1 a, V1 b) {
-  return (a>b) ? a : b;
-}
-
-template<typename V1>
-V1 abs(V1 a) {
-  return (a>0) ? a : -a;
-}
+  };
+  
+  
+  
+  template<typename T, int N> using ExtVec =  typename ExtVecTraits<T,N>::type;
+  template<typename T, int N> using ExtVecI =  typename ExtVecTraits<T,N>::itype;
+  
+  template<typename T> using Vec4D = ExtVec<T,4>;
+  template<typename T> using IVec4D = ExtVecI<T,4>;
+  
+  
+  template<typename V1,typename V2 >
+  auto dot(V1 const & a, V2 const & b)  ->decltype(a[0]*b[0]) {
+    decltype(a[0]*b[0]) r=0;
+    for (auto i=0U; i<4; ++i) r+=a[i]*b[i];
+    return r;
+  }
+  
+  template<typename V1>
+  V1 max(V1 a, V1 b) {
+    return (a>b) ? a : b;
+  }
+  
+  template<typename V1>
+  V1 abs(V1 a) {
+    return (a>0) ? a : -a;
+  }
 
 #ifdef __SSE2__
-int mask(Vec4D<float> m) {
-  return _mm_movemask_ps(m);
-}
+  int mask(Vec4D<float> m) {
+    return _mm_movemask_ps(m);
+  }
 #endif
-
+  
 #ifdef __AVX2__
-int mask(Vec4D<double> m) {
- return  _mm256_movemask_pd(m);
-}
+  int mask(Vec4D<double> m) {
+    return  _mm256_movemask_pd(m);
+  }
 #elif __SSE2__
-int mask(Vec4D<double> m) {
-  typedef double __attribute__( ( vector_size( 2*sizeof(double) ) ) ) V2D;
-  V2D & l = (V2D&)(m[0]);
-  V2D & h = (V2D&)(m[2]);
-  return _mm_movemask_pd(l) | (_mm_movemask_pd(h)<<2);
+  int mask(Vec4D<double> m) {
+    typedef double __attribute__( ( vector_size( 2*sizeof(double) ) ) ) V2D;
+    V2D & l = (V2D&)(m[0]);
+    V2D & h = (V2D&)(m[2]);
+    return _mm_movemask_pd(l) | (_mm_movemask_pd(h)<<2);
+  }
+#endif
+  
 }
+
+#ifdef USEVECEXT
+using namespace extvec;
 #endif
-
-#endif
-
-
 
 
 template<typename V>
@@ -316,8 +320,8 @@ namespace vect3d {
 
     operator Vector3D<float>() const { float zerol=0.; return Vector3D<float>(zerol,zerol,zerol); }
     operator Vector3D<double>() const { double zerol=0.; return Vector3D<double>(zerol,zerol,zerol); }
-    operator Vec4D<float>() const { return Vec4D<float>{zerof,zerof,zerof,zerof}; }
-    operator Vec4D<double>() const { return Vec4D<double>{zerod,zerod,zerod,zerod}; }
+    operator extvec::Vec4D<float>() const { return extvec::Vec4D<float>{zerof,zerof,zerof,zerof}; }
+    operator extvec::Vec4D<double>() const { return extvec::Vec4D<double>{zerod,zerod,zerod,zerod}; }
 
   };
 
@@ -329,14 +333,20 @@ inline
 std::ostream & operator<<(std::ostream & co, Vector3D<T> const & v) {
   return co << '('<< v.x() <<',' << v.y() <<',' <<  v.z() <<')';  
 }
-inline
-std::ostream & operator<<(std::ostream & co, Vec4D<float> const & v) {
+
+namespace extvec {
+  inline
+  std::ostream & operator<<(std::ostream & co, Vec4D<float> const & v) {
+    return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
+  }
+  inline
+  std::ostream & operator<<(std::ostream & co, Vec4D<double> const & v) {
   return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
+  } 
 }
-inline
-std::ostream & operator<<(std::ostream & co, Vec4D<double> const & v) {
-  return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
-}
+
+
+
 
 
 #include<vector>

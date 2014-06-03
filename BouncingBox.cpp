@@ -18,6 +18,7 @@ main(int argc, char* argv[]){
   using Float = vect3d::Float;
 
   using Part = Particle<Float>;
+  using PartV = Particle<Float, extvec::Vec4D>;
 
   using V3D = Part::V3D;
 
@@ -78,9 +79,11 @@ main(int argc, char* argv[]){
     t -= rdtscp();
 #pragma GCC ivdep
     for (auto i=0U; i< nBody; ++i) {
+      // PartV part; part.load(particles[i].mass(), particles[i].position(), particles[i].velocity(), particles[i].acceleration());
       auto && part = particles[i];
       part.update(deltaT);
       
+      // #ifdef  USESOA
 #ifndef  USEVECEXT
       for (unsigned int k=0; k<3; ++k) {
 	if (part.position()[k] > wallPos) part.scatter(k,wallPos);
@@ -88,16 +91,17 @@ main(int argc, char* argv[]){
       }
            
 #else
-      auto p = abs(part.position());
-      V3D outside = p>wallPos;
-      auto msk = mask(outside);
+      auto p = extvec::abs(part.position());
+      PartV::V4V outside = p>wallPos;
+      auto msk = extvec::mask(outside);
       if (msk) {
 	part.velocity() = (p<wallPos) ? part.velocity() : -part.velocity();
 	p = (p<wallPos) ? p : (wallPos - (p-wallPos));
 	part.position() = (part.position()>0) ? p : -p;
       }
 #endif
-      // particles[i] = part;
+      
+      // particles[i].load(part.mass(), part.position(), part.velocity(), part.acceleration());
     }
     t +=rdtscp();
 

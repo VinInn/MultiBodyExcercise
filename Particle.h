@@ -5,24 +5,48 @@
 #include "Vector3D.h"
 
 
-template <typename T>
+#ifdef USEVECEXT
+template <typename T, template<typename> class Vec=Vec4D >
+#else
+template <typename T, template<typename> class Vec=Vector3D >
+#endif
 class Particle {
 public:
 
   using value = typename std::remove_reference<T>::type;
   using ref = typename std::add_lvalue_reference<T>::type;
 
+
+  using T3D = Vec<T>;
+
 #ifdef USEVECEXT
-  using T3D = Vec4D<value>;
-  using V3D = Vec4D<value>;
-  using C3D = Vec4D<value>;
+  using V3D = Vec<value>;
+  using C3D = Vec<value>;
 #else
-  using T3D = Vector3D<T>;
-  using V3D = Vector3D<value>;
-  using C3D = Vector3D<value const &>;
-  using L3D = Vector3D<ref>;
+  using V3D = Vec<value>;
+  using C3D = Vec<value const &>;
+  using L3D = Vec<ref>;
 #endif
 
+  using V4V = extvec::Vec4D<value>;
+  using V3V = Vector3D<value>;
+
+  void load(T m, V4V pos, V4V vel, V4V acc) {
+    using VA = typename extvec::ExtVecTraits<T,4>::typeA;
+    *(VA *)(&m_pos) = pos;
+    *(VA *)(&m_vel) = vel;
+    *(VA *)(&m_acc) = acc;
+    m_mass=m;  
+  }
+  void load(T m, V3V pos, V3V vel, V3V acc) {
+    using VA = typename extvec::ExtVecTraits<T,4>::typeA;
+    m_pos= *(VA *)(&pos); m_pos[3]=0;
+    m_vel= *(VA *)(&vel);m_vel[3]=0;
+    m_acc= *(VA *)(&acc);m_acc[3]=0;
+    m_mass=m;  
+  }
+  
+  
 
   Particle(){}
   Particle(T m, T3D pos, T3D vel, T3D acc) : m_pos(pos), m_vel(vel)
