@@ -78,25 +78,26 @@ main(int argc, char* argv[]){
     t -= rdtscp();
 #pragma GCC ivdep
     for (auto i=0U; i< nBody; ++i) {
-      particles[i].update(deltaT);
+      auto && part = particles[i];
+      part.update(deltaT);
       
 #ifndef  USEVECEXT
       for (unsigned int k=0; k<3; ++k) {
-	if (particles[i].position()[k] > wallPos) particles[i].scatter(k,wallPos);
-	if (particles[i].position()[k] < -wallPos) particles[i].scatter(k,-wallPos);
+	if (part.position()[k] > wallPos) part.scatter(k,wallPos);
+	if (part.position()[k] < -wallPos) part.scatter(k,-wallPos);
       }
            
 #else
-      auto p = abs(particles[i].position());
+      auto p = abs(part.position());
       V3D outside = p>wallPos;
       auto msk = mask(outside);
       if (msk) {
-	particles[i].velocity() = (p<wallPos) ? particles[i].velocity() : -particles[i].velocity();
+	part.velocity() = (p<wallPos) ? part.velocity() : -part.velocity();
 	p = (p<wallPos) ? p : (wallPos - (p-wallPos));
-	particles[i].position() = (particles[i].position()>0) ? p : -p;
+	part.position() = (part.position()>0) ? p : -p;
       }
 #endif
-
+      // particles[i] = part;
     }
     t +=rdtscp();
 
