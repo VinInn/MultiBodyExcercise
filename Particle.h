@@ -102,7 +102,7 @@ private:
 };
 
 #else
-using Particles = std::vector<Particle<vect3d::Float>>; 
+using Particles = AVector<Particle<vect3d::Float>>; 
 #endif
 
 
