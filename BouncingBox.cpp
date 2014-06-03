@@ -22,6 +22,9 @@ main(int argc, char* argv[]){
 
   using V3D = Part::V3D;
 
+  std::cout << "Size of particle " << sizeof(Part) << std::endl;
+
+
   // std::vector<Part> particles;
   Particles particles;
 
