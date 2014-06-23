@@ -61,11 +61,13 @@ struct UltimateSoaTraits<Line<T>> {
 #include <iostream>
 int main() {
 
-  UltimateSoa<float>  f(10);
+  template<typename T> using Container = UltimateSoa<T>;
 
-  UltimateSoa<Vect<float>> vv(10);
+  Container<float>  f(10);
 
-  UltimateSoa<Line<float>> vl(10);
+  Container<Vect<float>> vv(10);
+
+  Container<Line<float>> vl(10);
 
   using V = Vect<float>;
   using L = Line<float>;
@@ -78,10 +80,17 @@ int main() {
   std::cout << vl[4].p.y << std::endl;
   std::cout << vl[7].p.y << std::endl;
 
+  swap(vl[4],vl[7]);
+
+  std::cout << vl[4].p.y << std::endl;
+  std::cout << vl[7].p.y << std::endl;
+
+
   UltimateSoa<Line<float>>::swap(vl[4],vl[7]);
 
   std::cout << vl[4].p.y << std::endl;
   std::cout << vl[7].p.y << std::endl;
+
 
   return (f[2]<0) & (vv[5].x>0) & (vl[3].p.y> vl[2].c.z);
 

@@ -35,7 +35,7 @@ public:
    template<std::size_t... I>
    void resize_impl(unsigned int n, std::index_sequence<I...>) { 
      using swallow = int[];
-     (void)swallow{0, ((void)(std::get<I>(data).resize(n)),0)...};
+     (void)swallow{0, ((void)(std::get<I>(m_data).resize(n)),0)...};
    }
    
   void resize(unsigned int n) {
@@ -51,17 +51,17 @@ public:
   auto size() const { return m_n;}
 
   template<typename V, std::size_t... I>
-   V t2r_impl(unsigned int j, std::index_sequence<I...>) {
-   return V(std::get<I>(data)[j] ...); 
- }
+  V t2r_impl(unsigned int j, std::index_sequence<I...>) {
+    return V(std::get<I>(m_data)[j] ...); 
+  }
 
   REF operator[](unsigned int j) {
-   return t2r_impl<REF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
- }
+    return t2r_impl<REF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
+  }
 
   CREF operator[](unsigned int j) const {
    return t2r_impl<CREF>(j,std::make_integer_sequence<std::size_t,std::tuple_size<Data>::value>{});
- }
+  }
 
 
   static void swap(REF a, REF b) {
@@ -69,7 +69,7 @@ public:
     a = b; b=tmp;
   } 
 
-  Data data;
+  Data m_data;
   unsigned int m_n=0;
 };
 
@@ -102,6 +102,14 @@ void swap(typename UltimateSoa<T,true>::REF a, typename UltimateSoa<T,true>::REF
   UltimateSoa<T,true>::swap(a,b);
 }
 */
+
+template<typename T, template<typename> class V>
+void swap(V<T&> a, V<T&> b) {
+  V<T> tmp = a;
+  a = b; b=tmp;
+};
+
+
 
 #endif
 

@@ -2,11 +2,7 @@
 #define Vector3D_H
 #include<cmath>
 #include<type_traits>
-#include "align_allocator.h"
-#include<vector>
 #include <x86intrin.h>
-
-template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 
 
 // #define USEDOUBLE
@@ -14,7 +10,7 @@ template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
 // #define  USESOA
 
 #ifndef USESOA
-#define USEVECEXT
+// #define USEVECEXT
 #endif
 
 
@@ -50,7 +46,7 @@ public:
   ref z() { return zi;}
 
 #ifdef USESOA
-  value operator[](unsigned int k) const {
+  cref operator[](unsigned int k) const {
     return (k==0) ? x() :( k==1 ? y() : z()); 
   }
 
@@ -113,9 +109,9 @@ public:
 
 template<typename T1, typename T2>
 inline
-Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type> 
-operator+(Vector3D<T1> a, Vector3D<T2> b) {
-  using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
+auto operator+(Vector3D<T1> a, Vector3D<T2> b) 
+  -> Vector3D<typename std::remove_const<typename std::remove_reference<decltype(a.x()+b.x())>::type>::type> {
+  using V = Vector3D<typename std::remove_const<typename std::remove_reference<decltype(a.x()+b.x())>::type>::type> ;
   //  return V(a.x()+b.x(),a.y()+b.y(),a.z()+b.z());
   V r=a; return r+=b;
 }
@@ -347,9 +343,12 @@ namespace extvec {
 
 
 
-
-
+#include "align_allocator.h"
 #include<vector>
+
+template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
+
+
 template<typename T>
 class SOA3D {
 public:
