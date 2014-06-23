@@ -32,6 +32,7 @@ public:
   using REF =  typename UltimateSoaTraits<T>::REF;
   using Data = typename UltimateSoaTraits<T>::SOATUPLE;
 
+  using value_type = VAL;
   using iterator = SoaIterator<REF, UltimateSoa<T, true>>;
   using const_iterator = SoaIterator<CREF, UltimateSoa<T, true>>;
 
@@ -95,7 +96,8 @@ public:
   using VAL = value;
   using CREF = cref;
   using REF = ref;
-  
+  using value_type = VAL;
+
   template<typename ... Args>
   UltimateSoa(Args... args) : Storage(args...){}
 
@@ -112,6 +114,7 @@ void swap(typename UltimateSoa<T,true>::REF a, typename UltimateSoa<T,true>::REF
   UltimateSoa<T,true>::swap(a,b);
 }
 */
+
 
 template<typename T, template<typename> class V>
 void swap(V<T&> a, V<T&> b) {

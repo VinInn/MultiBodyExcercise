@@ -2,9 +2,11 @@
 #define SoaIterator_H
 
 #include<type_traits>
+#include<iterator>
+#include <algorithm>
 
 template<typename TREF, typename Container> 
-class SoaIterator {
+class SoaIterator  : public std::iterator<std::random_access_iterator_tag, typename Container::value_type, int, typename std::add_pointer<typename Container::value_type>::type, TREF> {
 public:
  
   using ContainerP = typename std::add_pointer<Container>::type;
@@ -42,15 +44,20 @@ public:
   SoaIterator& operator+=(int rhs) {m_index += rhs; return *this;}
   SoaIterator& operator-=(int rhs) {m_index -= rhs; return *this;}
 
-  SoaIterator operator+(const SoaIterator& rhs) const {return SoaIterator(cont(), m_index+rhs.m_index);}
-  SoaIterator operator-(const SoaIterator& rhs) const {return SoaIterator(cont(), m_index-rhs.m_index);}
+  // SoaIterator operator+(const SoaIterator& rhs) const {return SoaIterator(cont(), m_index+rhs.m_index);}
+  //  SoaIterator operator-(const SoaIterator& rhs) const {return SoaIterator(cont(), m_index-rhs.m_index);}
+  int operator-(const SoaIterator& rhs) const {return  m_index-rhs.m_index;}
   SoaIterator operator+(int rhs) const {return SoaIterator(cont(),m_index+rhs);}
   SoaIterator operator-(int rhs) const {return SoaIterator(cont(),m_index-rhs);}
+
   friend  SoaIterator operator+(int lhs, const SoaIterator& rhs) {return SoaIterator(rhs.cont(),lhs+rhs.m_index);}
   friend  SoaIterator operator-(int lhs, const SoaIterator& rhs) {return SoaIterator(rhs.cont(),lhs-rhs.m_index);}
-  
+  friend  int distance(const SoaIterator& lhs, const SoaIterator& rhs) { return lhs.m_index-rhs.m_index;}
+  // operator int() const { return m_index;}
+
   // Operators : comparison
 public:
+  
    bool operator==(const SoaIterator& rhs) const {return m_index == rhs.m_index;}
    bool operator!=(const SoaIterator& rhs) const {return m_index != rhs.m_index;}
    bool operator>(const SoaIterator& rhs) const {return m_index > rhs.m_index;}
@@ -58,12 +65,15 @@ public:
    bool operator>=(const SoaIterator& rhs) const {return m_index >= rhs.m_index;}
    bool operator<=(const SoaIterator& rhs) const {return m_index <= rhs.m_index;}
   
+
+
+
   // Data members
 private:
-  ContainerR cont()  {return *m_cont;}
   ContainerP m_cont=nullptr;
   unsigned int m_index=0;
 };
+
 
 
 #endif

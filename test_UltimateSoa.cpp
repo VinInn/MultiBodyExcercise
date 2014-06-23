@@ -73,33 +73,45 @@ int main() {
   using V = Vect<float>;
   using L = Line<float>;
 
+
+  std::cout << "size = " << vl.size()<< std::endl;
   for (auto i=0U; i<vl.size(); ++i) {
     auto val = float(i);
     vl[i] = L(V{val,val,val},V{val,val,val});
   }
 
-  std::cout << vl[4].p.y << std::endl;
-  std::cout << vl[7].p.y << std::endl;
+  std::cout << vl[4].p.y << ' ' << vl[7].p.y << std::endl;
 
+  using std::swap;
   swap(vl[4],vl[7]);
 
-  std::cout << vl[4].p.y << std::endl;
-  std::cout << vl[7].p.y << std::endl;
+  std::cout << vl[4].p.y << ' ' << vl[7].p.y << std::endl;
+
+  swap(*(vl.begin()+3),*(vl.end()-2));
+
+  std::cout << vl[3].p.y << ' ' << vl[8].p.y << std::endl;
 
 
   for (auto && l : vl) l.p.y = -l.p.x;
 
-  vl[4].p.y = 23;
+  vl[5].p.y = 23;
 
   auto && m = std::max_element(vl.begin(),vl.end(),[](auto a, auto b){ return a.p.y<b.p.y;});
 
-  std::cout << (*m).p.y << std::endl;
+  std::cout << "max " << (*m).p.x << ' ' << (*m).p.y << std::endl;
 
   UltimateSoa<Line<float>>::swap(vl[4],vl[7]);
 
-  std::cout << vl[4].p.y << std::endl;
-  std::cout << vl[7].p.y << std::endl;
+  std::cout << vl[4].p.y << ' ' << vl[7].p.y << std::endl;
+ 
+  for (auto && l : vl) std::cout << l.p.y << ' ';
+  std::cout << std::endl;
+  std::sort(vl.begin(),vl.end(),[](auto a, auto b){ return a.p.y<b.p.y;});
 
+  std::cout << vl[0].p.x << ' ' << vl[9].p.x << std::endl;
+
+  for (auto && l : vl) std::cout << l.p.z << ' ';
+  std::cout << std::endl;
 
   return (f[2]<0) & (vv[5].x>0) & (vl[3].p.y> vl[2].c.z);
 
