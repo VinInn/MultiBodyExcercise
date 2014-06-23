@@ -1,4 +1,5 @@
 #include "UltimateSoa.h"
+#include <algorithm>
 
 
 template<typename T>
@@ -56,12 +57,12 @@ struct UltimateSoaTraits<Line<T>> {
 };
 
 
+template<typename T> using Container = UltimateSoa<T>;
 
 
 #include <iostream>
 int main() {
 
-  template<typename T> using Container = UltimateSoa<T>;
 
   Container<float>  f(10);
 
@@ -85,6 +86,14 @@ int main() {
   std::cout << vl[4].p.y << std::endl;
   std::cout << vl[7].p.y << std::endl;
 
+
+  for (auto && l : vl) l.p.y = -l.p.x;
+
+  vl[4].p.y = 23;
+
+  auto && m = std::max_element(vl.begin(),vl.end(),[](auto a, auto b){ return a.p.y<b.p.y;});
+
+  std::cout << (*m).p.y << std::endl;
 
   UltimateSoa<Line<float>>::swap(vl[4],vl[7]);
 

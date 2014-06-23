@@ -6,7 +6,7 @@
 #include <utility>
 #include <type_traits>
 #include "align_allocator.h"
-
+#include "SoaIterator.h"
 
 namespace details_UltimateSoa {
   template<typename T> using AVector = std::vector<T,align_allocator<T,32>>;
@@ -32,6 +32,9 @@ public:
   using REF =  typename UltimateSoaTraits<T>::REF;
   using Data = typename UltimateSoaTraits<T>::SOATUPLE;
 
+  using iterator = SoaIterator<REF, UltimateSoa<T, true>>;
+  using const_iterator = SoaIterator<CREF, UltimateSoa<T, true>>;
+
    template<std::size_t... I>
    void resize_impl(unsigned int n, std::index_sequence<I...>) { 
      using swallow = int[];
@@ -49,6 +52,13 @@ public:
    }
 
   auto size() const { return m_n;}
+
+  iterator begin() { return iterator(*this);}  
+  iterator   end() { return iterator(*this,size());}  
+
+  const_iterator begin() const { return const_iterator(*this);}  
+  const_iterator   end() const { return const_iterator(*this,size());}  
+
 
   template<typename V, std::size_t... I>
   V t2r_impl(unsigned int j, std::index_sequence<I...>) {
