@@ -100,15 +100,13 @@ int main() {
 
   std::cout << "max " << (*m).p.x << ' ' << (*m).p.y << std::endl;
 
-  UltimateSoa<Line<float>>::swap(vl[4],vl[7]);
 
-  std::cout << vl[4].p.y << ' ' << vl[7].p.y << std::endl;
- 
   for (auto && l : vl) std::cout << l.p.y << ' ';
   std::cout << std::endl;
   std::sort(vl.begin(),vl.end(),[](auto a, auto b){ return a.p.y<b.p.y;});
 
-  std::cout << vl[0].p.x << ' ' << vl[9].p.x << std::endl;
+    for (auto && l : vl) std::cout << l.p.y << ' ';
+    std::cout << std::endl;
 
   for (auto && l : vl) std::cout << l.p.z << ' ';
   std::cout << std::endl;

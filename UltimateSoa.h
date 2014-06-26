@@ -75,11 +75,6 @@ public:
   }
 
 
-  static void swap(REF a, REF b) {
-    VAL tmp = a;
-    a = b; b=tmp;
-  } 
-
   Data m_data;
   unsigned int m_n=0;
 };
@@ -101,10 +96,6 @@ public:
   template<typename ... Args>
   UltimateSoa(Args... args) : Storage(args...){}
 
-  static void swap(REF a, REF b) {
-    VAL tmp = a;
-    a = b; b=tmp;
-  } 
 
 };
 
@@ -120,7 +111,7 @@ template<typename T, template<typename> class V>
 void swap(V<T&> a, V<T&> b) {
   V<T> tmp = a;
   a = b; b=tmp;
-};
+}
 
 
 

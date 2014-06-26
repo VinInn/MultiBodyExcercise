@@ -19,7 +19,7 @@ public:
   explicit SoaIterator(ContainerR c, unsigned int ind=0) : m_cont(&c),m_index(ind){}
   SoaIterator(const SoaIterator &rhs) = default;
   SoaIterator& operator=(const SoaIterator &rhs)  = default;
-   SoaIterator(SoaIterator &&rhs) = default;
+  SoaIterator(SoaIterator &&rhs) = default;
   SoaIterator& operator=(SoaIterator &&rhs)  = default;
   template<typename Iter> 
   SoaIterator(const Iter &rhs) : m_cont(&rhs.cont()), m_index(rhs.index()) {}
@@ -29,7 +29,7 @@ public:
   ContainerR cont() const {return *m_cont;}
   unsigned int index() const { return m_index;}
   
-  // Operators : misc
+  // Operators : dereference
 public:
   TREF operator*() {return  cont()[m_index];}
   // Type* operator->() {return m_index;}
