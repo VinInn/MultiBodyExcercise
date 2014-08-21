@@ -3,10 +3,17 @@
 #include "Particle.h"
 #include<atomic>
 
+
+
 class Box {
 public:
   Box(unsigned int nBody);
-  using Float = vect3d::Float;
+#ifdef  USEDOUBLE
+  using Float = double;
+#else
+  using Float = float;
+#endif
+
   using uint = unsigned int;
   using V3D =  Particle<Float>::V3D;
 
@@ -30,7 +37,7 @@ private:
 
 
   Float wallPos = 1.;
-  Particles particles;
+  Particles<float> particles;
 
 
 };

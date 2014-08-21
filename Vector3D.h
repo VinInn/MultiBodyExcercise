@@ -2,16 +2,7 @@
 #define Vector3D_H
 #include<cmath>
 #include<type_traits>
-#include <x86intrin.h>
 
-
-// #define USEDOUBLE
-
-// #define  USESOA
-
-#ifndef USESOA
-// #define USEVECEXT
-#endif
 
 
 template<typename T>
@@ -203,33 +194,6 @@ inline
 std::ostream & operator<<(std::ostream & co, Vector3D<T> const & v) {
   return co << '('<< v.x() <<',' << v.y() <<',' <<  v.z() <<')';  
 }
-
-
-
-/*
-namespace vect3d {
-#ifdef  USEDOUBLE
-  using Float = double;
-#else
-  using Float = float;
-#endif
-
-  constexpr float zerof=0.; 
-  constexpr float zerod=0.; 
-  struct ZERO{
-
-    static Vector3D<Float> toV() { Float zerol=0.; return Vector3D<Float>(zerol,zerol,zerol); }
-
-    operator Vector3D<float>() const { float zerol=0.; return Vector3D<float>(zerol,zerol,zerol); }
-    operator Vector3D<double>() const { double zerol=0.; return Vector3D<double>(zerol,zerol,zerol); }
-    operator extvec::Vec4D<float>() const { return extvec::Vec4D<float>{zerof,zerof,zerof,zerof}; }
-    operator extvec::Vec4D<double>() const { return extvec::Vec4D<double>{zerod,zerod,zerod,zerod}; }
-
-  };
-
-}
-*/
-
 
 
 #endif

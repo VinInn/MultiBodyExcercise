@@ -2,7 +2,7 @@
 #define Particle_H
 
 
-#include "Vector3D.h"
+#include "Vect.h"
 
 
 #ifdef USEVECEXT
@@ -94,10 +94,11 @@ private:
 // #define  USESOA
 
 #ifdef USESOA
+template<typename T>
 class Particles {
 public:
 
-  using Float = vect3d::Float;
+  using Float = T;
   using CP = Particle<Float const &>;
   using RP = Particle<Float &&>;
   using LP = Particle<Float&>;
@@ -126,7 +127,7 @@ private:
 };
 
 #else
-using Particles = AVector<Particle<vect3d::Float>>; 
+template<typename T> using Particles = AVector<Particle<T>>; 
 #endif
 
 
