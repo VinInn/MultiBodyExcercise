@@ -4,7 +4,7 @@
 #include<cmath>
 #include<type_traits>
 #include <x86intrin.h>
-
+#include<cstring>
 
 namespace extvec {
 
@@ -55,7 +55,7 @@ namespace extvec {
   inline
   int ftoi(float f) { int i;  memcpy(&i,&f,sizeof(float)); return i;}
 
-
+}
   
   template<typename V1,typename V2 >
   auto dot(V1 const & a, V2 const & b)  ->decltype(a[0]*b[0]) {
@@ -75,25 +75,27 @@ namespace extvec {
   }
 
 #ifdef __SSE2__
-  int mask(Vec4D<float> m) {
+  inline
+  int mask(extvec::Vec4D<float> m) {
     return _mm_movemask_ps(m);
   }
 #endif
   
 #ifdef __AVX2__
-  int mask(Vec4D<double> m) {
+  inline
+  int mask(extvec::Vec4D<double> m) {
     return  _mm256_movemask_pd(m);
   }
 #elif __SSE2__
-  int mask(Vec4D<double> m) {
+  inline
+  int mask(extvec::Vec4D<double> m) {
     typedef double __attribute__( ( vector_size( 2*sizeof(double) ) ) ) V2D;
     V2D & l = (V2D&)(m[0]);
     V2D & h = (V2D&)(m[2]);
     return _mm_movemask_pd(l) | (_mm_movemask_pd(h)<<2);
   }
 #endif
-  
-}
+
 
 #include<ostream>
 namespace extvec {

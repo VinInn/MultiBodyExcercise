@@ -1,7 +1,7 @@
 #ifndef SoaV3D_H
 #define SoaV3D_H
 
-#include "Vector3d.h"
+#include "Vect.h"
 
 #include "align_allocator.h"
 #include<vector>

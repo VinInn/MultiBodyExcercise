@@ -1,6 +1,7 @@
 #ifndef Vector3D_H
 #define Vector3D_H
 #include<cmath>
+#include<algorithm>
 #include<type_traits>
 
 
@@ -163,9 +164,9 @@ operator/(Vector3D<T2> a, T1 b) {
 
 
 
-template<typename V1,typename V2 >
+template<typename T1, typename T2>
 inline
-auto dot(V1 const & a, V2 const & b)  ->decltype(a.x()*b.x()) {
+auto dot(Vector3D<T1> const & a, Vector3D<T2> const & b)  ->decltype(a.x()*b.x()) {
   return a.x()*b.x() + a.y()*b.y() + a.z()*b.z();
 }
 
