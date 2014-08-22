@@ -1,0 +1,4 @@
+source compileNative "testBox.cpp"; ./a.out 1024 | tail -1 
+source compileNative "testBox.cpp -DUSEVECEXT"; ./a.out 1024 | tail -1
+source compileNative "testBox.cpp -DUSESOA"; ./a.out 1024 | tail -1
+

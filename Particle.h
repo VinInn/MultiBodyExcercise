@@ -6,7 +6,7 @@
 
 
 #ifdef USEVECEXT
-template <typename T, template<typename> class Vec=Vec4D >
+template <typename T, template<typename> class Vec=extvec::Vec4D >
 #else
 template <typename T, template<typename> class Vec=Vector3D >
 #endif
@@ -92,6 +92,9 @@ private:
 };
 
 // #define  USESOA
+
+#include "SoaV3D.h"
+
 
 #ifdef USESOA
 template<typename T>

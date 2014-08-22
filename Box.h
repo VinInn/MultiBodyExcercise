@@ -4,7 +4,6 @@
 #include<atomic>
 
 
-
 class Box {
 public:
   Box(unsigned int nBody);
