@@ -1,3 +1,3 @@
-c++ -std=c++11 -Ofast -Wall -fopenmp -S main.cpp   -fno-math-errno -o main_Ofast.S
-c++ -std=c++11 -O3 -Wall -fopenmp -S main.cpp   -fno-math-errno -o main_O3.S
+c++ -std=c++1y -Ofast -Wall -fopenmp -S $1  -fno-math-errno -march=haswell
+#c++ -std=c++1y -O3 -Wall -fopenmp -S $1   -fno-math-errno
 
