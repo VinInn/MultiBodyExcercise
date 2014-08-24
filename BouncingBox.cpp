@@ -15,7 +15,11 @@
 int 
 main(int argc, char* argv[]){
   
-  using Float = vect3d::Float;
+#ifdef  USEDOUBLE
+  using Float = double;
+#else
+  using Float = float;
+#endif
 
   using Part = Particle<Float>;
   using PartV = Particle<Float, extvec::Vec4D>;
@@ -26,7 +30,7 @@ main(int argc, char* argv[]){
 
 
   // std::vector<Part> particles;
-  Particles particles;
+  Particles<Float> particles;
 
   if (argc < 2) {
     std::cout << "please provide number of bodies, time step, coupling-costant, file name\n" << std::endl;
@@ -104,9 +108,9 @@ main(int argc, char* argv[]){
 
            
 #else
-      auto p = extvec::abs(part.position());
+      auto p = abs(part.position());
       PartV::V4V outside = p>wallPos;
-      auto msk = extvec::mask(outside);
+      auto msk = mask(outside);
       if (msk) {
 	part.velocity() = (p<wallPos) ? part.velocity() : -part.velocity();
 	p = (p<wallPos) ? p : (wallPos - (p-wallPos));

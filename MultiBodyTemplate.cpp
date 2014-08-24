@@ -15,7 +15,12 @@
 int 
 main(int argc, char* argv[]){
   
-  using Float = vect3d::Float;
+#ifdef  USEDOUBLE
+  using Float = double;
+#else
+  using Float = float;
+#endif
+
 
   using Part = Particle<Float>;
   // using PartV = Particle<Float, Part::V4V>;
@@ -23,7 +28,7 @@ main(int argc, char* argv[]){
   using V3D = Part::V3D;
 
   // std::vector<Part> particles;
-  Particles particles;  // "vector of particles"
+  Particles<Float> particles;  // "vector of particles"
 
   if (argc < 2) {
     std::cout << "please provide number of particles, time step, coupling-costant, file name\n" << std::endl;

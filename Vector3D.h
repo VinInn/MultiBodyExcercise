@@ -171,10 +171,10 @@ auto dot(Vector3D<T1> const & a, Vector3D<T2> const & b)  ->decltype(a.x()*b.x()
 }
 
 
-template<typename T1, typename T2>
+template<typename T1>
 inline
 Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
-max(Vector3D<T1> a, Vector3D<T2> b) {
+max(Vector3D<T1> const & a, Vector3D<T1> const & b) {
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   return V(std::max(a.x(),b.x()),std::max(a.y(),b.y()),std::max(a.z(),b.z()));
 }
@@ -182,7 +182,7 @@ max(Vector3D<T1> a, Vector3D<T2> b) {
 template<typename T1>
 inline
 Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>
-abs(Vector3D<T1> a) {
+abs(Vector3D<T1> const & a) {
   using V = Vector3D<typename std::remove_const<typename std::remove_reference<T1>::type>::type>;
   return V(std::abs(a.x()),std::abs(a.y()),std::abs(a.z()));
 }

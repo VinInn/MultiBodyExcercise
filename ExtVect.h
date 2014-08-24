@@ -6,6 +6,13 @@
 #include <x86intrin.h>
 #include<cstring>
 
+
+#ifdef __AVX__
+#define NATIVE_VECT_LENGH 32
+#else
+#define NATIVE_VECT_LENGH 16
+#endif
+
 namespace extvec {
 
   template<typename T>
@@ -98,17 +105,13 @@ namespace extvec {
 
 
 #include<ostream>
-namespace extvec {
   inline
-  std::ostream & operator<<(std::ostream & co, Vec4D<float> const & v) {
+  std::ostream & operator<<(std::ostream & co, extvec::Vec4D<float> const & v) {
     return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
   }
   inline
-  std::ostream & operator<<(std::ostream & co, Vec4D<double> const & v) {
+  std::ostream & operator<<(std::ostream & co, extvec::Vec4D<double> const & v) {
   return co << '('<< v[0] <<',' << v[1] <<',' <<  v[2] <<',' <<  v[3] <<')';  
   } 
-}
-
-
 
 #endif
