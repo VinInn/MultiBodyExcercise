@@ -1,3 +1,9 @@
-c++ -std=c++1y -Ofast -Wall -fopenmp -S $1  -fno-math-errno -march=haswell
+echo "nehalem"
+c++ -std=c++1y -Ofast -Wall -fopenmp -S $1 -fopt-info-vec -fopt-info-vec-missed -fno-tree-slp-vectorize -march=nehalem                              
+echo "nehalem force if-convert-stores"
+c++ -std=c++1y -Ofast -Wall -fopenmp -S $1 -fopt-info-vec -march=nehalem -ftree-loop-if-convert-stores
+echo "hashwell"
+c++ -std=c++1y -Ofast -Wall -fopenmp -S $1  -fopt-info-vec -march=haswell
+c++ -std=c++1y -Ofast -Wall -fopenmp -S $1  -fopt-info-vec -fopt-info-vec-missed -fno-tree-slp-vectorize -march=haswell
 #c++ -std=c++1y -O3 -Wall -fopenmp -S $1   -fno-math-errno
 
