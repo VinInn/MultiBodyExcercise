@@ -77,26 +77,30 @@ public:
   using REF = VectorN<ref,DIM>;
 
 
+  /*
   template<typename V, typename W, std::size_t... I>
   static  V t2r_impl(W const &  w, std::index_sequence<I...>) {
     return V(std::get<I>(w) ...); 
   }
+  */
 
   template<typename V, typename W, std::size_t... I>
-  static  V t2r_impl(W & w, std::index_sequence<I...>) {
+  static  V t2r_impl(W && w, std::index_sequence<I...>) {
     return V(std::get<I>(w) ...); 
   }
 
 
   constexpr VectorN(){}
+  using tuple_type::tuple_type;
 
-  template<typename ... Args>
-    explicit constexpr  VectorN(T t, Args... args) : tuple_type(t,args...){}
+
+  //  template<typename ... Args>
+  //  explicit constexpr  VectorN(T t, Args... args) : tuple_type(t,args...){}
   
   template<typename V>
-    constexpr VectorN(V v) : tuple_type(t2r_impl<tuple_type>(v,std::make_integer_sequence<std::size_t,N>{}) ){}
+    constexpr VectorN(V && v) : tuple_type(t2r_impl<tuple_type>(v,std::make_integer_sequence<std::size_t,N>{}) ){}
   template<typename V>
-    VectorN & operator=(V const & v) { tuple_type::operator=(t2r_impl<tuple_type>(v,std::make_integer_sequence<std::size_t,N>{})); return *this;}
+    VectorN & operator=(V && v) { tuple_type::operator=(t2r_impl<tuple_type>(v,std::make_integer_sequence<std::size_t,N>{})); return *this;}
 
   constexpr VectorN(VectorN const & v) : tuple_type(v){}
   VectorN & operator=(VectorN const & v) { tuple_type::operator=(v); return *this;}
