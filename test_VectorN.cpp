@@ -39,11 +39,16 @@ int main() {
 
   std::get<2>(r3) = 3.4;
 
-  Container<V5> cont; cont.resize(16);
+  Container<V5> cont; cont.resize(32);
+  Container<float> f1; f1.resize(32);
+  Container<float> f2; f2.resize(32);
+
+  for (auto i=0U; i<cont.size(); ++i) { f1[i]=i; f2[i]=-i*10;}
 
   
   for (auto i=0U; i<cont.size(); ++i) {
-    std::get<2>(cont[i]) = 3.2;
+    std::get<2>(cont[i]) = f1[i]+f2[i];
+    std::get<3>(cont[i]) = f1[i]-f2[i];
   }
   
 
@@ -51,7 +56,7 @@ int main() {
 
   std::cout << std::get<2>(a5) << std::endl;
   std::cout << std::get<2>(r3) << std::endl;
-
+  std::cout << std::get<3>(cont[12]) << std::endl;
 
   return 0;
 };
