@@ -50,13 +50,15 @@ main(int argc, char* argv[]){
 
   std::mt19937 eng;
   std::uniform_real_distribution<float> rgen(-wallPos,wallPos);
+  constexpr float v0 = 0.05f;
 
   Float zero = 0;
   const V3D zeroV{zero,zero,zero};
   constexpr Float mass = 1.;
 
   for (auto i=0U; i< nBody; ++i)
-    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},zeroV,zeroV);
+    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},
+		      V3D{v0*rgen(eng),v0*rgen(eng),v0*rgen(eng)},zeroV);
 
 
 
@@ -80,12 +82,12 @@ main(int argc, char* argv[]){
     // return delta*(fact/(d*std::sqrt(d)));
     
     // long range force
-    auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*fact/d2;
+    // auto d2 = dist2(b.position(),a.position())+eps;
+    // return delta*fact/d2;
     
     // coulomb
-    //auto d2 = dist2(b.position(),a.position())+eps;
-    //return delta*(fact/(std::sqrt(d2)*d2));
+    auto d2 = dist2(b.position(),a.position())+eps;
+    return delta*(fact/(std::sqrt(d2)*d2));
 
     // spring
     // return delta*fact;
@@ -94,7 +96,7 @@ main(int argc, char* argv[]){
   };
   
 
-  auto nLoop = (unsigned int)(1000/deltaT);
+  auto nLoop = (unsigned int)(10000/deltaT);
 
   // warm up
   // set initial conditions: give a deterministic "shake"
@@ -107,6 +109,7 @@ main(int argc, char* argv[]){
   }
   
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
+  std::ofstream temper(argc > 5 ? argv[5] :  "temperature.txt");
 
   for(auto k=0U; k<nLoop; ++k) {
     t -= rdtscp();
@@ -137,6 +140,7 @@ main(int argc, char* argv[]){
 	       << std::endl;
    }
 
+   temper << k*deltaT << ' ' << mag(particles[iprobe].velocity()) << '\n';
 #ifdef USEVECEXT
    probeTraj << particles[iprobe].position()[0]  << ' '<< particles[iprobe].position()[1]  << ' '<< particles[iprobe].position()[2] << '\n';
 #else

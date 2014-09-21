@@ -3,10 +3,30 @@
 ./a.out 100000 0.001 -10. probeTraj01.txt | tail -n 3
 ./a.out 100000 0.0005 -10. probeTraj05.txt | tail -n 3
 
+./a.out 100000 0.5 -20. probeTraj50.txt | tail -n 3
+./a.out 100000 0.1 -20. probeTraj10.txt | tail -n 3
+./a.out 100000 0.01 -20. probeTraj1.txt | tail -n 3
+./a.out 100000 0.001 -20. probeTraj01.txt | tail -n 3
+
+
+./a.out 10000 0.5 -20. probeTraj50.txt | tail -n 3
+./a.out 10000 0.1 -20. probeTraj10.txt | tail -n 3
+./a.out 10000 0.01 -20. probeTraj1.txt | tail -n 3
+./a.out 10000 0.001 -20. probeTraj01.txt | tail -n 3
+
+
+./a.out 1000 0.5 -50. probeTraj50.txt | tail -n 3
+./a.out 1000 0.1 -50. probeTraj10.txt | tail -n 3
+./a.out 1000 0.01 -50. probeTraj1.txt | tail -n 3
+./a.out 1000 0.001 -50. probeTraj01.txt | tail -n 3
+
+
+
 set term png
 set output 'probeTrajectory.png'
 plot 'probeTraj10.txt' with lines, 'probeTraj1.txt'with lines,  'probeTraj01.txt' with lines,  'probeTraj05.txt' with lines
 
+plot 'probeTraj50.txt' with lines, 'probeTraj10.txt' with lines, 'probeTraj1.txt'with lines,  'probeTraj01.txt' with lines
 
 
 time  ./a.out 100000 0.001 -100. probeTraj001.txt | tail -3

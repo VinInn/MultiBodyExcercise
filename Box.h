@@ -52,23 +52,23 @@ Box::Box(unsigned int nBody) : particles(nBody){
   V3D zero = vect3d::ZERO();
   constexpr Float mass = 1.;
 
+  constexpr Float speed = 0.001;
+
   for (auto i=0U; i< nBody; ++i)
-    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},zero,zero);
+    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},
+		      speed*V3D{rgen(eng),rgen(eng),rgen(eng)},zero);
 
 
 }
 
 
 void Box::computeForce() {
-  //  constexpr Float eps = 0.0001;
   V3D zero = vect3d::ZERO();
-
-  // constexpr Float fact = .1e-6;
  
   
   auto force = [=](auto a, auto b) -> V3D {
-    constexpr Float eps = 0.0001;
-    constexpr Float fact = .1e-7;
+    constexpr Float eps = 0.00001;
+    constexpr Float fact = 5.e-8;
     
     auto && delta = b.position()-a.position();
     // very long range force
@@ -76,12 +76,12 @@ void Box::computeForce() {
     // return delta*(fact/(d*std::sqrt(d)));
     
     // long range force
-    auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*fact/d2;
+    // auto d2 = dist2(b.position(),a.position())+eps;
+    // return delta*fact/d2;
 
     // coulomb
-    // auto d2 = dist2(b.position(),a.position())+eps;
-    // return delta*(fact/(std::sqrt(d2)*d2));
+    auto d2 = dist2(b.position(),a.position())+eps;
+    return delta*(fact/(std::sqrt(d2)*d2));
 
     // spring
     // return delta*fact;
