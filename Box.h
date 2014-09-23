@@ -17,9 +17,9 @@ public:
   using V3D =  Particle<Float>::V3D;
 
 
-  void oneStep() {
+  void oneStep(Float dt) {
     computeForce();
-    evolve();
+    evolve(dt);
     verifyBoundaries();
   }
 
@@ -27,23 +27,25 @@ public:
 
   Float temperature() const;
 
+  Particles<float> const particles() const { return m_particles;}
+
 
 private:
 
   void computeForce();
-  void evolve();
+  void evolve(Float dt);
   void verifyBoundaries();
 
 
   Float wallPos = 1.;
-  Particles<float> particles;
+  Particles<float> m_particles;
 
 
 };
 
 
 
-Box::Box(unsigned int nBody) : particles(nBody){
+Box::Box(unsigned int nBody) : m_particles(nBody){
 
   std::mt19937 eng;
   std::uniform_real_distribution<Float> rgen(-wallPos,wallPos);
@@ -54,9 +56,13 @@ Box::Box(unsigned int nBody) : particles(nBody){
 
   constexpr Float speed = 0.001;
 
-  for (auto i=0U; i< nBody; ++i)
-    particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},
-		      speed*V3D{rgen(eng),rgen(eng),rgen(eng)},zero);
+  unsigned int nHeavy = nBody/50;
+  for (auto i=0U; i< nHeavy; ++i)
+    m_particles[i].fill(20.f*mass,V3D{rgen(eng),rgen(eng),rgen(eng)},
+			speed/1.f*V3D{rgen(eng),rgen(eng),rgen(eng)},zero);
+  for (auto i=nHeavy; i< nBody; ++i)
+    m_particles[i].fill(mass,V3D{rgen(eng),rgen(eng),rgen(eng)},
+			speed/1.f*V3D{rgen(eng),rgen(eng),rgen(eng)},zero);
 
 
 }
@@ -68,7 +74,7 @@ void Box::computeForce() {
   
   auto force = [=](auto a, auto b) -> V3D {
     constexpr Float eps = 0.00001;
-    constexpr Float fact = 5.e-8;
+    constexpr Float fact = -1.e-8;
     
     auto && delta = b.position()-a.position();
     // very long range force
@@ -76,12 +82,12 @@ void Box::computeForce() {
     // return delta*(fact/(d*std::sqrt(d)));
     
     // long range force
-    // auto d2 = dist2(b.position(),a.position())+eps;
-    // return delta*fact/d2;
+    //auto d2 = dist2(b.position(),a.position())+eps;
+    //return a.mass()*b.mass()*delta*fact/d2;
 
     // coulomb
     auto d2 = dist2(b.position(),a.position())+eps;
-    return delta*(fact/(std::sqrt(d2)*d2));
+    return a.mass()*b.mass()*delta*(fact/(std::sqrt(d2)*d2));
 
     // spring
     // return delta*fact;
@@ -89,38 +95,38 @@ void Box::computeForce() {
   };
   
 
-  auto nBody= particles.size();
+  auto nBody= m_particles.size();
 
-  for (auto i=0U; i< nBody; ++i) particles[i].acceleration()=zero;
+  for (auto i=0U; i< nBody; ++i) m_particles[i].acceleration()=zero;
 
 
 
   for (auto i=1U; i< nBody; ++i) {
-    V3D tmp = particles[i].acceleration();
+    V3D tmp = m_particles[i].acceleration();
     for (auto j=0U; j< i; ++j) {
-      auto && f = force(particles[i],particles[j]);
+      auto && f = force(m_particles[i],m_particles[j]);
       tmp-=f;
-      particles[j].acceleration()+=f;
+      m_particles[j].acceleration()+=f;
     }
-    particles[i].acceleration() = tmp;
+    m_particles[i].acceleration() = tmp;
   }
 
-  for (auto i=0U; i< nBody; ++i) particles[i].acceleration()/=particles[i].mass();
+  for (auto i=0U; i< nBody; ++i) m_particles[i].acceleration()/=m_particles[i].mass();
 }
 
 
-void Box::evolve() {
-  auto nBody= particles.size();
-  for (auto i=0U; i< nBody; ++i) particles[i].update();
+void Box::evolve(Float dt) {
+  auto nBody= m_particles.size();
+  for (auto i=0U; i< nBody; ++i) m_particles[i].update(dt);
 }
 
 
 void Box::verifyBoundaries() {
-  auto nBody= particles.size();
+  auto nBody= m_particles.size();
   for (auto i=0U; i< nBody; ++i) {
     for (unsigned int k=0; k<3; ++k) {
-      if (particles[i].position()[k] > wallPos) particles[i].scatter(k,wallPos);
-      else if (particles[i].position()[k] < -wallPos) particles[i].scatter(k,-wallPos);
+      if (m_particles[i].position()[k] > wallPos) m_particles[i].scatter(k,wallPos);
+      else if (m_particles[i].position()[k] < -wallPos) m_particles[i].scatter(k,-wallPos);
     }
   }
 }
@@ -128,17 +134,17 @@ void Box::verifyBoundaries() {
 
 Box::Float Box::temperature() const {
   Float t=0.;
-  auto nBody= particles.size();
-  for (auto i=0U; i< nBody; ++i) t+= mag(particles[i].velocity());
-  return t/Float(particles.size());
+  auto nBody= m_particles.size();
+  for (auto i=0U; i< nBody; ++i) t+= mag(m_particles[i].velocity());
+  return t/Float(m_particles.size());
 }
 
 
 #include<cassert>
 void Box::check() const {
-  auto nBody= particles.size();
+  auto nBody= m_particles.size();
   for (auto i=0U; i< nBody; ++i)
     for (unsigned int k=0; k<3; ++k) 
-      assert(std::abs(particles[i].position()[k]) <= wallPos);
+      assert(std::abs(m_particles[i].position()[k]) <= wallPos);
 
 }

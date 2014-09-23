@@ -21,6 +21,13 @@
 ./a.out 1000 0.001 -50. probeTraj01.txt | tail -n 3
 
 
+./a.out 2000 0.00001 -40. probeTraj50.txt | tail -n 3
+./a.out 2000 0.000001 -40. probeTraj10.txt | tail -n 3
+./a.out 2000 0.0000001 -40. probeTraj1.txt | tail -n 3
+./a.out 2000 0.00000001 -40. probeTraj01.txt | tail -n 3
+
+
+
 
 set term png
 set output 'probeTrajectory.png'

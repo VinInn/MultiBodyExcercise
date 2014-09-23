@@ -96,10 +96,11 @@ main(int argc, char* argv[]){
   };
   
 
-  auto nLoop = (unsigned int)(10000/deltaT);
+  constexpr float tMax = 10000.;
 
   // warm up
   // set initial conditions: give a deterministic "shake"
+  /*
   for(auto k=0U; k<500; ++k) {
     V3D forceT=zeroV;
     for (auto i=0U; i< nBody; ++i) 
@@ -107,11 +108,15 @@ main(int argc, char* argv[]){
     particles[iprobe].acceleration()=forceT;
     particles[iprobe].update(k<50 ? 0.1 : 0.5f);
   }
-  
+  */
+
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
   std::ofstream temper(argc > 5 ? argv[5] :  "temperature.txt");
 
-  for(auto k=0U; k<nLoop; ++k) {
+  float tTot=0;
+  auto k=0U;
+  while (tTot<tMax) {
+    // auto dT = std::min(.1f,deltaT/(0.0001f+mag(particles[iprobe].velocity())));
     t -= rdtscp();
     V3D forceT=zeroV;
     //#pragma omp parallel for simd
@@ -122,18 +127,22 @@ main(int argc, char* argv[]){
       forceT -= f;
     }
     forceTot=forceT;
+
+    auto dT = std::min(.1f,deltaT/(0.000001f+mag(forceTot)));
+    tTot+=dT;
+
     auto dd = abs((forceTot-particles[iprobe].acceleration())/mag(particles[iprobe].velocity()));
-    maxDA = max(maxDA,dd);
+    maxDA = max(maxDA,dd*dT);
     maxDV = std::max(maxDV,mag(dd));
     aveDV +=mag(dd);
     aveV +=mag(particles[iprobe].velocity());
 
     particles[iprobe].acceleration()=forceTot;
-    particles[iprobe].update(deltaT);
+    particles[iprobe].update(dT);
     t +=rdtscp();
 
    if (1==k%100){
-     std::cout << "time/force " << t << ' ' << forceTot << std::endl;
+     std::cout << "time/time/force " << t << ' ' << tTot<< ' ' << dT <<' ' << forceTot << std::endl;
      std::cout << "time/position " << t << ' ' << particles[iprobe].position() 
 	       << ' ' << particles[iprobe].velocity()
 	       << ' ' << mag(particles[iprobe].velocity())
@@ -146,14 +155,14 @@ main(int argc, char* argv[]){
 #else
    probeTraj << particles[iprobe].position().x()  << ' '<< particles[iprobe].position().y()  << ' '<< particles[iprobe].position().z() << '\n';
 #endif
-   
+   ++k;
   }
   
-  std::cout  << std::endl << "time/force/maxDA " << t << ' ' << forceTot
-	     << ' '<< deltaT*maxDA << ' '<< deltaT*maxDV 
-	     << ' '<< deltaT*aveDV/nLoop
-	     << ' '<< aveV/nLoop  << std::endl;
-  std::cout << "time/position " << double(t)/nLoop << ' ' << particles[iprobe].position() 
+  std::cout  << std::endl << "time/nloop/force/maxDA " << t << ' ' << k << ' ' << forceTot
+	     << ' '<< maxDA << ' '<< maxDV 
+	     << ' '<< aveDV/k
+	     << ' '<< aveV/k  << std::endl;
+  std::cout << "time/position " << double(t)/k << ' ' << particles[iprobe].position() 
 	    << ' ' << particles[iprobe].velocity() << ' ' << mag(particles[iprobe].velocity())<< std::endl;
  
   return 0;

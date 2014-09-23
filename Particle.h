@@ -87,7 +87,7 @@ private:
   T3D m_vel;
   T3D m_acc;
   T m_mass;
-  // T m_charge;
+  //  T m_charge;
 
 };
 
