@@ -25,16 +25,18 @@ main(int argc, char* argv[]){
 
   unsigned int nBody = ::atoi(argv[1]);
 
+  Float deltaT = 1.f;
+  float fact = 1.e-8;
 
-  Box box(nBody);
+  if (argc > 2) deltaT = ::atof(argv[2]);
+  if (argc > 3) fact = ::atof(argv[3]);
+
+
+
+  Box box(nBody,fact);
   
   box.check();
 
-  Float deltaT = 1.f;
-  Float fact = 1.e-8;
-
-  if (argc > 2) deltaT = ::atof(argv[2]);
-  if (argc > 3) fact = 1.e-9*::atof(argv[3]);
 
   std::cout << "start " << nBody << ' ' << deltaT << ' ' << fact<< std::endl;
 
@@ -56,6 +58,7 @@ main(int argc, char* argv[]){
 
  
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
+  std::ofstream probeSpeed(argc > 5 ? argv[5] :  "speed.txt");
   std::ofstream temper(argc > 5 ? argv[5] :  "temperature.txt");
   std::ofstream cloud(argc > 5 ? argv[5] :  "cloud.txt");
 
@@ -79,7 +82,8 @@ main(int argc, char* argv[]){
 		<< std::endl;
     }
     
-    temper << k*deltaT << ' ' << mag(probe.velocity()) << '\n';
+    probeSpeed << k*deltaT << ' ' << mag(probe.velocity()) << '\n';
+    temper << k*deltaT << ' ' << box.temperature() << '\n';
 #ifdef USEVECEXT
     probeTraj << probe.position()[0]  << ' '<< probe].position()[1]  << ' '<< probe.position()[2] << '\n';
 #else

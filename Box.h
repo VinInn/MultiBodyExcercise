@@ -6,7 +6,7 @@
 
 class Box {
 public:
-  Box(unsigned int nBody);
+  Box(unsigned int nBody, float kf);
 #ifdef  USEDOUBLE
   using Float = double;
 #else
@@ -37,6 +37,7 @@ private:
   void verifyBoundaries();
 
 
+  Float kforce;
   Float wallPos = 1.;
   Particles<float> m_particles;
 
@@ -45,7 +46,7 @@ private:
 
 
 
-Box::Box(unsigned int nBody) : m_particles(nBody){
+Box::Box(unsigned int nBody, float kf) : kforce(kf), m_particles(nBody) {
 
   std::mt19937 eng;
   std::uniform_real_distribution<Float> rgen(-wallPos,wallPos);
@@ -54,7 +55,7 @@ Box::Box(unsigned int nBody) : m_particles(nBody){
   V3D zero = vect3d::ZERO();
   constexpr Float mass = 1.;
 
-  constexpr Float speed = 0.001;
+  constexpr Float speed = 0.0001;
 
   unsigned int nHeavy = nBody/50;
   for (auto i=0U; i< nHeavy; ++i)
@@ -72,9 +73,9 @@ void Box::computeForce() {
   V3D zero = vect3d::ZERO();
  
   
-  auto force = [=](auto a, auto b) -> V3D {
+  auto force = [&](auto a, auto b) -> V3D {
     constexpr Float eps = 0.00001;
-    constexpr Float fact = -1.e-8;
+    const Float fact = 1.e-9*kforce;
     
     auto && delta = b.position()-a.position();
     // very long range force
@@ -123,19 +124,45 @@ void Box::evolve(Float dt) {
 
 void Box::verifyBoundaries() {
   auto nBody= m_particles.size();
+
   for (auto i=0U; i< nBody; ++i) {
-    for (unsigned int k=0; k<3; ++k) {
-      if (m_particles[i].position()[k] > wallPos) m_particles[i].scatter(k,wallPos);
-      else if (m_particles[i].position()[k] < -wallPos) m_particles[i].scatter(k,-wallPos);
-    }
+    auto && part = m_particles[i];
+#ifndef  USEVECEXT
+    if (part.position().x() > wallPos) part.scatter(0,wallPos);
+    if (part.position().x() < -wallPos) part.scatter(0,-wallPos);
+    if (part.position().y() > wallPos) part.scatter(1,wallPos);
+    if (part.position().y() < -wallPos) part.scatter(1,-wallPos);
+    if (part.position().z() > wallPos) part.scatter(2,wallPos);
+    if (part.position().z() < -wallPos) part.scatter(2,-wallPos);
+  
+  
+#else
+  auto p = abs(part.position());
+  PartV::V4V outside = p>wallPos;
+  auto msk = mask(outside);
+  if (msk) {
+    part.velocity() = (p<wallPos) ? part.velocity() : -part.velocity();
+    p = (p<wallPos) ? p : (wallPos - (p-wallPos));
+    part.position() = (part.position()>0) ? p : -p;
   }
+#endif
+  }
+
+  /*
+    for (auto i=0U; i< nBody; ++i) {
+    for (unsigned int k=0; k<3; ++k) {
+    if (m_particles[i].position()[k] > wallPos) m_particles[i].scatter(k,wallPos);
+      else if (m_particles[i].position()[k] < -wallPos) m_particles[i].scatter(k,-wallPos);
+      }
+      }
+  */
 }
 
 
 Box::Float Box::temperature() const {
   Float t=0.;
   auto nBody= m_particles.size();
-  for (auto i=0U; i< nBody; ++i) t+= mag(m_particles[i].velocity());
+  for (auto i=0U; i< nBody; ++i) t+= m_particles[i].mass()*mag(m_particles[i].velocity());
   return t/Float(m_particles.size());
 }
 
