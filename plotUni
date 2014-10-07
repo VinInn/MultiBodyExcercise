@@ -1,6 +1,8 @@
 
-./a.out 1000 0.05
+./a.out 1000 0.05 -10.
 
 plot 'cloud.txt' with point
 plot 'temperature.txt' with lines
 plot 'probeTraj.txt' with lines
+plot 'speed.txt' with point
+

@@ -18,15 +18,15 @@ main(int argc, char* argv[]){
   using Float = Box::Float;
 
   if (argc < 2) {
-    std::cout << "please provide number of bodies, time step, coupling-costant, file name\n" << std::endl;
+    std::cout << "please provide number of bodies, time step, coupling-costant, files name\n" << std::endl;
     exit(-1);
   }
   
 
   unsigned int nBody = ::atoi(argv[1]);
 
-  Float deltaT = 1.f;
-  float fact = 1.e-8;
+  Float deltaT = 0.1f;
+  float fact = -10.;
 
   if (argc > 2) deltaT = ::atof(argv[2]);
   if (argc > 3) fact = ::atof(argv[3]);
@@ -59,8 +59,8 @@ main(int argc, char* argv[]){
  
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
   std::ofstream probeSpeed(argc > 5 ? argv[5] :  "speed.txt");
-  std::ofstream temper(argc > 5 ? argv[5] :  "temperature.txt");
-  std::ofstream cloud(argc > 5 ? argv[5] :  "cloud.txt");
+  std::ofstream temper(argc > 6 ? argv[6] :  "temperature.txt");
+  std::ofstream cloud(argc > 7 ? argv[7] :  "cloud.txt");
 
   float tTot=0;
   auto k=0U;
