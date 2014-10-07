@@ -25,8 +25,16 @@ template<typename T> using NativeVector =  typename NativeVectorTraits<T>::type;
 
 #ifdef __AVX__
   inline
+  unsigned int mask(NativeVector<int> m) {
+    return  _mm256_movemask_ps(NativeVector<float>(m));
+  }
+  inline
   unsigned int mask(NativeVector<float> m) {
     return  _mm256_movemask_ps(m);
+  }
+  inline
+  unsigned int mask(NativeVector<long long> m) {
+    return  _mm256_movemask_pd(NativeVector<double>(m));
   }
   inline
   unsigned int mask(NativeVector<double> m) {
@@ -42,8 +50,16 @@ template<typename T> using NativeVector =  typename NativeVectorTraits<T>::type;
   }
 #else
   inline
+  int mask(NativeVector<int> m) {
+    return _mm_movemask_ps(NativeVector<float>(m));
+  }
+  inline
   int mask(NativeVector<float> m) {
     return _mm_movemask_ps(m);
+  }
+  inline
+  unsigned int mask(NativeVector<long long> m) {
+    return  _mm_movemask_pd(NativeVector<double>(m));
   }
   inline
   int mask(NativeVector<double> m) {

@@ -8,6 +8,7 @@ int main() {
   using VF = NativeVector<float>;
   
   NativeVector<float> v1 = nativeVector::zero<NativeVector<float>>() + 1;
+  NativeVector<float> v2 = nativeVector::zero<NativeVector<float>>() + 2;
   std::cout<< v1 << std::endl;
  
   VF a,b,x;
@@ -23,7 +24,7 @@ int main() {
   auto m = (a>b) ? a : b; 
   auto t = a/b; t = (x>float(M_PI)/8.f) ? (t-1.0f)/(t+1.0f) : t;
 
-
+  std::cout << c << ' ' << z << ' ' << m << std::endl;
   std::cout<< t << std::endl;
 
 
@@ -33,5 +34,10 @@ int main() {
   std::cout << 1.f/sqrt(x) << ' ' << 1.f/std::sqrt(0.1f) << std::endl;
   // std::cout<<  std::ios::defaultfloat;
 
+  std::cout<<  std::boolalpha;
+  std::cout << nativeVector::any(v2>v1) << ' ' <<  nativeVector::all(v2>v1) << ' ' << !nativeVector::any(v2<v1) << ' ' <<  !nativeVector::all(v2<v1) << std::endl;
+  v2[2] = -1;
+  std::cout << nativeVector::any(v2>v1) << ' ' <<  !nativeVector::all(v2>v1) << ' ' << nativeVector::any(v2<v1) << ' ' <<  !nativeVector::all(v2<v1) << std::endl;
 
+  return 0;
 };
