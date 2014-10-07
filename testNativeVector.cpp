@@ -3,6 +3,19 @@
 #include<cmath>
 #include<iostream>
 #include<iomanip>
+
+namespace std {
+  std::ios_base& defaultfloat(std::ios_base& str) {
+    str.unsetf(std::ios_base::floatfield);
+    return str;
+  }
+
+ ios_base& hexfloat(ios_base& str) {
+   str.setf(ios_base::fixed | ios_base::scientific, ios_base::floatfield);
+   return str;
+ }
+}
+
 int main() {
 
   using VF = NativeVector<float>;
@@ -29,10 +42,10 @@ int main() {
 
 
   x = nativeVector::zero<NativeVector<float>>() + 0.1f; 
-  // std::cout<< std::ios::hexfloat;
+  // std::cout<< std::hexfloat;
   std::cout << nativeVector::invSqrt(x) << ' ' << 1.f/std::sqrt(0.1f) << std::endl;
   std::cout << 1.f/sqrt(x) << ' ' << 1.f/std::sqrt(0.1f) << std::endl;
-  // std::cout<<  std::ios::defaultfloat;
+  // std::cout<<  std::defaultfloat;
 
   std::cout<<  std::boolalpha;
   std::cout << nativeVector::any(v2>v1) << ' ' <<  nativeVector::all(v2>v1) << ' ' << !nativeVector::any(v2<v1) << ' ' <<  !nativeVector::all(v2<v1) << std::endl;
