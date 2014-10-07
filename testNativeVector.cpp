@@ -2,6 +2,7 @@
 
 #include<cmath>
 #include<iostream>
+#include<iomanip>
 int main() {
 
   using VF = NativeVector<float>;
@@ -26,6 +27,11 @@ int main() {
   std::cout<< t << std::endl;
 
 
+  x = nativeVector::zero<NativeVector<float>>() + 0.1f; 
+  // std::cout<< std::ios::hexfloat;
+  std::cout << nativeVector::invSqrt(x) << ' ' << 1.f/std::sqrt(0.1f) << std::endl;
+  std::cout << 1.f/sqrt(x) << ' ' << 1.f/std::sqrt(0.1f) << std::endl;
+  // std::cout<<  std::ios::defaultfloat;
 
 
 };

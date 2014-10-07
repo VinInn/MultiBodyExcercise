@@ -32,6 +32,14 @@ template<typename T> using NativeVector =  typename NativeVectorTraits<T>::type;
   unsigned int mask(NativeVector<double> m) {
     return  _mm256_movemask_pd(m);
   }
+  inline
+  NativeVector<float> sqrt(NativeVector<float> m) {
+    return  _mm256_sqrt_ps(m);
+  }
+  inline
+  NativeVector<double> sqrt(NativeVector<double> m) {
+    return  _mm256_sqrt_pd(m);
+  }
 #else
   inline
   int mask(NativeVector<float> m) {
@@ -40,6 +48,14 @@ template<typename T> using NativeVector =  typename NativeVectorTraits<T>::type;
   inline
   int mask(NativeVector<double> m) {
     return _mm_movemask_pd(m);
+  }
+  inline
+  NativeVector<float> sqrt(NativeVector<float> m) {
+    return  _mm_sqrt_ps(m);
+  }
+  inline
+  NativeVector<double> sqrt(NativeVector<double> m) {
+    return  _mm_sqrt_pd(m);
   }
 #endif
 
@@ -89,7 +105,17 @@ namespace nativeVector {
   }
 
 
+
+  NativeVector<float> invSqrt(NativeVector<float> x){
+    NativeVector<int> i;  memcpy(&i,&x,sizeof(i));
+    i = 0x5f3759df - (i >> 1);
+    NativeVector<float> y; memcpy(&y,&i,sizeof(i)); // very approximate
+    y *= (1.5f - 0.5f * x * y * y); // better
+    return y * (1.5f - 0.5f * x * y * y); // 2ULP
+  }
+
 }
+
 
 
 
