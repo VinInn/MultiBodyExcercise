@@ -3,6 +3,13 @@
 
 template<typename V>
 inline
+auto mag2(V const & a) ->decltype(dot(a,a)) {
+  return dot(a,a);
+} 
+
+
+template<typename V>
+inline
 auto mag(V const & a) ->decltype(dot(a,a)) {
   return std::sqrt(dot(a,a));
 } 

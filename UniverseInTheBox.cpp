@@ -75,7 +75,8 @@ main(int argc, char* argv[]){
     auto const & probe = box.particles()[iprobe];
 
     if (1==k%100){
-      std::cout << "time/time/temp " << t << ' ' << tTot<< ' ' << dT <<' ' << box.temperature() << std::endl;
+      std::cout << "time/time/temp/ken/pen " << t << ' ' << tTot<< ' ' << dT 
+		<<' ' << box.temperature()<<' ' << box.kinEnergy()<<' ' << box.potentialEnergy() << std::endl;
       std::cout << "time/position " << t << ' ' << probe.position() 
 		<< ' ' << probe.velocity()
 		<< ' ' << mag(probe.velocity())

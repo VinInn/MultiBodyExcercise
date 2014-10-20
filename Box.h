@@ -26,6 +26,8 @@ public:
   void check() const;
 
   Float temperature() const;
+  Float kinEnergy() const;
+  Float potentialEnergy() const { return potEner;}
 
   Particles<float> const particles() const { return m_particles;}
 
@@ -39,6 +41,7 @@ private:
 
   Float kforce;
   Float wallPos = 1.;
+  Float potEner=0;
   Particles<float> m_particles;
 
 
@@ -73,7 +76,7 @@ void Box::computeForce() {
   V3D zero = vect3d::ZERO();
  
   
-  auto force = [&](auto a, auto b) -> V3D {
+  auto force = [&](auto a, auto b, Float & ep) -> V3D {
     constexpr Float eps = 0.00001;
     const Float fact = 1.e-9*kforce;
     
@@ -88,6 +91,7 @@ void Box::computeForce() {
 
     // coulomb
     auto d2 = dist2(b.position(),a.position())+eps;
+    ep -= a.mass()*b.mass()*fact/std::sqrt(d2);
     return a.mass()*b.mass()*delta*(fact/(std::sqrt(d2)*d2));
 
     // spring
@@ -101,16 +105,17 @@ void Box::computeForce() {
   for (auto i=0U; i< nBody; ++i) m_particles[i].acceleration()=zero;
 
 
-
+  Float pEn=0;
   for (auto i=1U; i< nBody; ++i) {
     V3D tmp = m_particles[i].acceleration();
     for (auto j=0U; j< i; ++j) {
-      auto && f = force(m_particles[i],m_particles[j]);
+      auto && f = force(m_particles[i],m_particles[j],pEn);
       tmp-=f;
       m_particles[j].acceleration()+=f;
     }
     m_particles[i].acceleration() = tmp;
   }
+  potEner = pEn;
 
   for (auto i=0U; i< nBody; ++i) m_particles[i].acceleration()/=m_particles[i].mass();
 }
@@ -165,6 +170,14 @@ Box::Float Box::temperature() const {
   for (auto i=0U; i< nBody; ++i) t+= m_particles[i].mass()*mag(m_particles[i].velocity());
   return t/Float(m_particles.size());
 }
+
+Box::Float Box::kinEnergy() const {
+  Float t=0.;
+  auto nBody= m_particles.size();
+  for (auto i=0U; i< nBody; ++i) t+= m_particles[i].mass()*mag2(m_particles[i].velocity());
+  return 0.5f*t;
+}
+
 
 
 #include<cassert>
