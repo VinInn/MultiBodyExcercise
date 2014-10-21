@@ -41,9 +41,6 @@ main(int argc, char* argv[]){
   std::cout << "start " << nBody << ' ' << deltaT << ' ' << fact<< std::endl;
 
 
-
-
-
   long long t = 0;
   auto iprobe = nBody/2;
 
@@ -60,7 +57,8 @@ main(int argc, char* argv[]){
   std::ofstream probeTraj(argc > 4 ? argv[4] :  "probeTraj.txt");
   std::ofstream probeSpeed(argc > 5 ? argv[5] :  "speed.txt");
   std::ofstream temper(argc > 6 ? argv[6] :  "temperature.txt");
-  std::ofstream cloud(argc > 7 ? argv[7] :  "cloud.txt");
+  std::ofstream energy(argc > 7 ? argv[7] :  "energy.txt");
+  std::ofstream cloud(argc > 8 ? argv[8] :  "cloud.txt");
 
   float tTot=0;
   auto k=0U;
@@ -71,6 +69,8 @@ main(int argc, char* argv[]){
     tTot+=dT;
     box.oneStep(dT);
     t +=rdtscp();
+
+
     
     auto const & probe = box.particles()[iprobe];
 
@@ -85,6 +85,7 @@ main(int argc, char* argv[]){
     
     probeSpeed << k*deltaT << ' ' << mag(probe.velocity()) << '\n';
     temper << k*deltaT << ' ' << box.temperature() << '\n';
+    energy << k*deltaT << ' ' << box.kinEnergy() + box.potentialEnergy() << '\n';
 #ifdef USEVECEXT
     probeTraj << probe.position()[0]  << ' '<< probe].position()[1]  << ' '<< probe.position()[2] << '\n';
 #else

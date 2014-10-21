@@ -91,7 +91,7 @@ void Box::computeForce() {
 
     // coulomb
     auto d2 = dist2(b.position(),a.position())+eps;
-    ep -= a.mass()*b.mass()*fact/std::sqrt(d2);
+    ep += a.mass()*b.mass()*fact/std::sqrt(d2);
     return a.mass()*b.mass()*delta*(fact/(std::sqrt(d2)*d2));
 
     // spring
